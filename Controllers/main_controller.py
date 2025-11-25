@@ -1,6 +1,7 @@
 
 from Models.user_model import UserModel
 from Views.login_view import LoginView
+from Controllers.doctor_controller import DoctorController
 
 ## esta clase manejara la autenticacion y las vistas a las que tiene acceso cada usuario
 class MainController:
@@ -62,6 +63,7 @@ class MainController:
         # Ejemplo de lógica de ruteo:
         if role == 'Doctor':
             # Si es Doctor, puede que queramos llevarlo directamente a su módulo de Expediente.
+            self.doctor_controller = DoctorController(self.root, self.current_user)
             print("Abriendo Módulo de Expediente Clínico...")
             # Aquí se crearía una instancia de views.expediente_view
         else:
