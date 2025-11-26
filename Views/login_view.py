@@ -1,6 +1,14 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 
+PALETTE = {
+    "primary": "#247D7F",
+    "secondary": "#44916F",
+    "accent": "#B2D9C4",
+    "bg": "#80B9C8",
+    "warn": "#C29470",
+}
+
 class LoginView(tk.Toplevel):
     """
     Interfaz gráfica de inicio de sesión.
@@ -17,6 +25,14 @@ class LoginView(tk.Toplevel):
         self.title("Inicio de Sesión")
         self.geometry("350x250")
         self.resizable(False, False)
+        self.configure(bg=PALETTE["bg"]) 
+        style = ttk.Style()
+        style.theme_use("clam")
+        style.configure("TFrame", background=PALETTE["bg"]) 
+        style.configure("TLabel", background=PALETTE["bg"], foreground="#0F3D3E")
+        style.configure("Primary.TButton", padding=8, foreground="white", background=PALETTE["primary"]) 
+        style.map("Primary.TButton", background=[("active", PALETTE["secondary"])])
+        style.configure("Form.TEntry", fieldbackground="#FFFFFF")
         
         # Centrar la ventana en la pantalla (opcional)
         self.center_window()
@@ -52,20 +68,20 @@ class LoginView(tk.Toplevel):
 
         # --- 2. Campo Email ---
         ttk.Label(self, text="Email:").grid(row=1, column=0, padx=10, pady=5, sticky="w")
-        self.email_entry = ttk.Entry(self, textvariable=self.email_var, width=30)
+        self.email_entry = ttk.Entry(self, textvariable=self.email_var, width=30, style="Form.TEntry")
         self.email_entry.grid(row=1, column=1, padx=10, pady=5, sticky="ew")
         self.email_entry.focus() # Enfocar automáticamente
 
         # --- 3. Campo Contraseña ---
         ttk.Label(self, text="Contraseña:").grid(row=2, column=0, padx=10, pady=5, sticky="w")
-        self.password_entry = ttk.Entry(self, textvariable=self.password_var, show="*", width=30)
+        self.password_entry = ttk.Entry(self, textvariable=self.password_var, show="*", width=30, style="Form.TEntry")
         self.password_entry.grid(row=2, column=1, padx=10, pady=5, sticky="ew")
         
         # Permite iniciar sesión presionando Enter
         self.password_entry.bind('<Return>', lambda event: self._login_command())
 
         # --- 4. Botón de Login ---
-        ttk.Button(self, text="Ingresar", command=self._login_command, cursor="hand2") \
+        ttk.Button(self, text="Ingresar", style="Primary.TButton", command=self._login_command, cursor="hand2") \
            .grid(row=3, column=0, columnspan=2, pady=20)
         
     def _login_command(self):

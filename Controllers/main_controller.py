@@ -1,6 +1,9 @@
 
 from Models.user_model import UserModel
 from Views.login_view import LoginView
+from Views.main_menu_view import MainMenuView
+from Views.facturacion_view import FacturacionView
+from Views.pagos_view import PagosView
 
 ## esta clase manejara la autenticacion y las vistas a las que tiene acceso cada usuario
 class MainController:
@@ -31,10 +34,11 @@ class MainController:
         """
         Maneja la solicitud de login desde la vista.
         """
-        # 🚨 En una aplicación real:
-        # 1. El password (texto plano) se hashea aquí.
-        # 2. Se pasa el hash al modelo.
-        # Por simplicidad, usaremos el texto plano como si fuera el hash.
+        email = email.strip()
+        password = password.strip()
+        if not (self.user_model and self.user_model.db and self.user_model.db.connection and self.user_model.db.connection.is_connected()):
+            self.login_view.show_error("No hay conexión con la base de datos.")
+            return
         
         # 1. Llamar al Modelo para autenticar
         user_data = self.user_model.get_user_by_credentials(email, password)
@@ -51,23 +55,7 @@ class MainController:
             self.login_view.show_error("Credenciales incorrectas o usuario no encontrado.")
 
     def show_main_menu(self, role):
-        """
-        Carga la vista del menú principal o el módulo directo según el rol.
-        Aquí se implementa el Control de Acceso Basado en Roles (RBAC).
-        """
-        # Nota: Por ahora, solo mostraremos un mensaje, 
-        # pero aquí cargarías la clase views.main_menu_view.py
-        print(f"--- Cargando Menú Principal para {role} ---")
-        
-        # Ejemplo de lógica de ruteo:
-        if role == 'Doctor':
-            # Si es Doctor, puede que queramos llevarlo directamente a su módulo de Expediente.
-            print("Abriendo Módulo de Expediente Clínico...")
-            # Aquí se crearía una instancia de views.expediente_view
-        else:
-            # Para Administrador y Recepcionista, cargamos el menú con opciones.
-            # Aquí se crearía una instancia de views.main_menu_view
-            print(f"Cargando menú con opciones permitidas para {role}...")
+        self.menu_view = MainMenuView(self.root, self)
 
     # --- Métodos de Enrutamiento (Stubs) ---
     # Estos métodos serían llamados por los botones en main_menu_view
@@ -85,6 +73,12 @@ class MainController:
         else:
             # Esto es una validación de seguridad extra en el controlador
             print("ACCESO DENEGADO a Reportes.")
+
+    def open_facturacion_module(self):
+        FacturacionView(self.root)
+
+    def open_pagos_module(self):
+        PagosView(self.root)
 
     def __del__(self):
         """Cierra la conexión a la DB al terminar la aplicación."""
