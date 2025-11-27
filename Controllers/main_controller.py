@@ -1,6 +1,7 @@
 
 from Models.user_model import UserModel
 from Views.login_view import LoginView
+from Controllers.cita_controller import CitaController
 
 ## esta clase manejara la autenticacion y las vistas a las que tiene acceso cada usuario
 class MainController:
@@ -31,10 +32,6 @@ class MainController:
         """
         Maneja la solicitud de login desde la vista.
         """
-        # 🚨 En una aplicación real:
-        # 1. El password (texto plano) se hashea aquí.
-        # 2. Se pasa el hash al modelo.
-        # Por simplicidad, usaremos el texto plano como si fuera el hash.
         
         # 1. Llamar al Modelo para autenticar
         user_data = self.user_model.get_user_by_credentials(email, password)
@@ -45,7 +42,8 @@ class MainController:
             print(f"✅ Login exitoso. Rol: {self.current_user['Nombre_Rol']}")
             
             # 2. Proceder al menú principal/router
-            self.show_main_menu(self.current_user['Nombre_Rol'])
+            self.open_citas_module()
+        
         else:
             # 3. Notificar a la vista del error
             self.login_view.show_error("Credenciales incorrectas o usuario no encontrado.")
@@ -59,18 +57,8 @@ class MainController:
         # pero aquí cargarías la clase views.main_menu_view.py
         print(f"--- Cargando Menú Principal para {role} ---")
         
-        # Ejemplo de lógica de ruteo:
-        if role == 'Doctor':
-            # Si es Doctor, puede que queramos llevarlo directamente a su módulo de Expediente.
-            print("Abriendo Módulo de Expediente Clínico...")
-            # Aquí se crearía una instancia de views.expediente_view
-        else:
-            # Para Administrador y Recepcionista, cargamos el menú con opciones.
-            # Aquí se crearía una instancia de views.main_menu_view
-            print(f"Cargando menú con opciones permitidas para {role}...")
 
-    # --- Métodos de Enrutamiento (Stubs) ---
-    # Estos métodos serían llamados por los botones en main_menu_view
+
     
     def open_pacientes_module(self):
         print("Abriendo Gestión de Pacientes...")
@@ -78,6 +66,13 @@ class MainController:
         
     def open_citas_module(self):
         print("Abriendo Programación de Citas...")
+        for widget in self.root.winfo_children():
+            widget.destroy()
+
+        # Cargar el controlador
+        self.cita_controller = CitaController(self.root, self)
+        print("✅ Módulo de Programación de Citas cargado.")
+        
         
     def open_reportes_module(self):
         if self.current_user and self.current_user['Nombre_Rol'] == 'Administrador':
