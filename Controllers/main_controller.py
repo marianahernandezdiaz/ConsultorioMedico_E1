@@ -1,6 +1,7 @@
 
 from Models.user_model import UserModel
 from Views.login_view import LoginView
+from Views.reportes_view import ReportesView
 
 ## esta clase manejara la autenticacion y las vistas a las que tiene acceso cada usuario
 class MainController:
@@ -58,15 +59,11 @@ class MainController:
         # Nota: Por ahora, solo mostraremos un mensaje, 
         # pero aquí cargarías la clase views.main_menu_view.py
         print(f"--- Cargando Menú Principal para {role} ---")
-        
-        # Ejemplo de lógica de ruteo:
-        if role == 'Doctor':
-            # Si es Doctor, puede que queramos llevarlo directamente a su módulo de Expediente.
+        if role == 'Administrador':
+            self.open_reportes_module()
+        elif role == 'Doctor':
             print("Abriendo Módulo de Expediente Clínico...")
-            # Aquí se crearía una instancia de views.expediente_view
         else:
-            # Para Administrador y Recepcionista, cargamos el menú con opciones.
-            # Aquí se crearía una instancia de views.main_menu_view
             print(f"Cargando menú con opciones permitidas para {role}...")
 
     # --- Métodos de Enrutamiento (Stubs) ---
@@ -81,7 +78,7 @@ class MainController:
         
     def open_reportes_module(self):
         if self.current_user and self.current_user['Nombre_Rol'] == 'Administrador':
-            print("Abriendo Reportes de Ocupación...")
+            ReportesView(self.root)
         else:
             # Esto es una validación de seguridad extra en el controlador
             print("ACCESO DENEGADO a Reportes.")
