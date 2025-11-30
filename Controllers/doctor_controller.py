@@ -11,7 +11,7 @@ class DoctorController:
         self.view = DoctorView(self.root, self, user_data['Nombre_usuario'])
         
         self.paciente_seleccionado_id = None
-        self.registro_seleccionado_id = None # ID del Historial seleccionado para editar/eliminar
+        self.registro_seleccionado_id = None 
         
         self.cargar_lista_pacientes()
 
@@ -20,14 +20,12 @@ class DoctorController:
         self.view.actualizar_lista_pacientes(pacientes)
 
     def seleccionar_paciente(self, id_paciente, nombre_paciente):
-        """Al clickear un paciente a la izquierda"""
-        self.view.limpiar_form() # Limpiar form anterior
+        self.view.limpiar_form() 
         self.paciente_seleccionado_id = id_paciente
         self.view.lbl_paciente_seleccionado.config(text=f"Expediente de: {nombre_paciente}")
         self._recargar_historial()
 
     def seleccionar_registro_historial(self, id_historial, diagnostico, tratamiento):
-        """Al clickear un registro del historial a la derecha"""
         self.registro_seleccionado_id = id_historial
         self.view.llenar_form(diagnostico, tratamiento)
 
@@ -39,7 +37,6 @@ class DoctorController:
     def gestion_historial(self, accion):
         """Maneja Crear, Actualizar y Eliminar"""
         
-        # 1. Validaciones Comunes
         if not self.paciente_seleccionado_id:
             messagebox.showwarning("!", "Seleccione un paciente primero.")
             return
@@ -47,7 +44,6 @@ class DoctorController:
         diag = self.view.txt_diag.get("1.0", "end-1c").strip()
         trat = self.view.txt_trat.get("1.0", "end-1c").strip()
 
-        # 2. Lógica por Acción
         if accion == "crear":
             if not diag or not trat:
                 messagebox.showerror("Error", "Llene diagnóstico y tratamiento.")
@@ -84,6 +80,5 @@ class DoctorController:
                     self._post_accion()
 
     def _post_accion(self):
-        """Limpieza después de una acción exitosa"""
         self.view.limpiar_form()
         self._recargar_historial()

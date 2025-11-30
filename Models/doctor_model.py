@@ -39,7 +39,7 @@ class DoctorModel:
                 INSERT INTO Historial_Medico (ID_Cita, Diagnostico, Tratamiento, ID_Doctor) 
                 VALUES (%s, %s, %s, %s)
             """
-            # Actualizamos cita a atendida también
+
             self.db.execute_commit("UPDATE Citas SET Estado = 'Atendida' WHERE ID_Cita = %s", (id_cita,))
             return self.db.execute_commit(query_insert, (id_cita, diagnostico, tratamiento, id_doctor))
         except Exception as e:

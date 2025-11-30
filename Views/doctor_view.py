@@ -52,7 +52,7 @@ class DoctorView(tk.Frame):
         frame_hist = tk.LabelFrame(frame_right, text="Historial Médico (Seleccione para editar)", bg=COLOR_FONDO, fg=COLOR_TITULOS, font=("Arial", 10, "bold"))
         frame_hist.pack(fill=tk.BOTH, expand=True, pady=10)
 
-        # OJO: Agregamos columna ID_Historial oculta o visible para control interno
+        #Agregamos columna ID_Historial oculta o visible para control interno
         self.tree_historial = ttk.Treeview(frame_hist, columns=("ID_H", "Fecha", "Doctor", "Diag", "Trat"), show="headings", height=6)
         self.tree_historial.heading("ID_H", text="ID"); self.tree_historial.column("ID_H", width=30)
         self.tree_historial.heading("Fecha", text="Fecha"); self.tree_historial.column("Fecha", width=100)
@@ -130,7 +130,6 @@ class DoctorView(tk.Frame):
         self.txt_diag.insert("1.0", diag)
         self.txt_trat.delete("1.0", tk.END)
         self.txt_trat.insert("1.0", trat)
-        # Cambiamos color de fondo para indicar modo edición
         self.frame_form.config(text="EDITANDO REGISTRO EXISTENTE", fg=COLOR_BTN_EDIT)
 
     def limpiar_form(self):
