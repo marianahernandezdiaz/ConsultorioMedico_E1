@@ -6,6 +6,7 @@ from Views.login_view import LoginView
 from Views.main_menu_view import MainMenuView_1
 from Views.menu_view import MainMenuView
 from Views.GPacientes.PacientesMenuPrincipal import PacientesMenuPrincipal
+from Views.reportes_view import ReportesView
 from Controllers.cita_controller import CitaController
 from tkinter import messagebox
 import tkinter as tk # Necesario para la clase base del root
@@ -120,7 +121,11 @@ class MainController:
 
     def open_reportes_module(self):
         print("Abriendo Reportes de Ocupación...")
-        # Aquí iría la lógica para cargar el ReportesController
+        for widget in self.root.winfo_children():
+            widget.destroy()
+           
+        self.open_reportes_module = ReportesView(self.root)
+        print("✅ Módulo de reportes cargado.")
 
 
     def handle_modify_cita(self, cita_id, id_doctor, new_fecha, new_hora, new_motivo, new_estado, form_view):
