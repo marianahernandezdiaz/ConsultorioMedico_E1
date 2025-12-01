@@ -1,7 +1,7 @@
 from Models.user_model import UserModel
 from Views.login_view import LoginView
 from Controllers.doctor_controller import DoctorController
-from Models.cita_Model import CitaModel # Importación CRÍTICA
+from Models.cita_Model import CitaModel 
 from Views.login_view import LoginView 
 from Views.menu_view import MainMenuView
 from Views.GPacientes.PacientesMenuPrincipal import PacientesMenuPrincipal
@@ -46,60 +46,38 @@ class MainController:
         Carga la vista del menú principal o el módulo directo según el rol.
         Aquí se implementa el Control de Acceso Basado en Roles (RBAC).
         """
-        # Nota: Por ahora, solo mostraremos un mensaje, 
-        # pero aquí cargarías la clase views.main_menu_view.py
-        print(f"--- Cargando Menú Principal para {role} ---")
-        
-        # Ejemplo de lógica de ruteo:
-        if role == 'Doctor':
-            # Si es Doctor, puede que queramos llevarlo directamente a su módulo de Expediente.
-            self.doctor_controller = DoctorController(self.root, self.current_user)
-            print("Abriendo Módulo de Expediente Clínico...")
-            # Aquí se crearía una instancia de views.expediente_view
-        else:
-            # Para Administrador y Recepcionista, cargamos el menú con opciones.
-            # Aquí se crearía una instancia de views.main_menu_view
-            print(f"Cargando menú con opciones permitidas para {role}...")
-
-    # --- Métodos de Enrutamiento (Stubs) ---
-    # Estos métodos serían llamados por los botones en main_menu_view
-    
-            """
-            Implementa el Control de Acceso Basado en Roles (RBAC) 
-            y carga la vista del menú principal.
-            """
-            options = []
+        options = []
 
             # 1. Gestión de Pacientes (Administrador, Recepcionista)
-            if role in ('Administrador', 'Recepcionista'):
-                options.append(("1. Gestión de Pacientes", self.open_pacientes_module))
+        if role in ('Administrador', 'Recepcionista'):
+            options.append(("1. Gestión de Pacientes", self.open_pacientes_module))
                 
             # 2. Programación de Citas (Recepcionista)
-            if role == 'Recepcionista':
-                options.append(("2. Programación de Citas", self.open_citas_module))
+        if role == 'Recepcionista':
+            options.append(("2. Programación de Citas", self.open_citas_module))
                 
             # 3. Expediente Clínico (Doctor)
-            if role == 'Doctor':
-                options.append(("3. Expediente Clínico", self.open_expediente_module))
+        if role == 'Doctor':
+            options.append(("3. Expediente Clínico", self.open_expediente_module))
 
             # 4. Facturación y Pagos (Administrador, Recepcionista)
-            if role in ('Administrador', 'Recepcionista'):
-                options.append(("4. Facturación y Pagos", self.open_facturacion_module))
+        if role in ('Administrador', 'Recepcionista'):
+            options.append(("4. Facturación y Pagos", self.open_facturacion_module))
 
             # 5. Reportes de Ocupación (Administrador)
-            if role == 'Administrador':
-                options.append(("5. Reportes de Ocupación", self.open_reportes_module))
+        if role == 'Administrador':
+            options.append(("5. Reportes de Ocupación", self.open_reportes_module))
                 
-            if not options:
-                messagebox.showinfo("Acceso Denegado", "Su rol no tiene módulos asignados.")
-                return
+        if not options:
+            messagebox.showinfo("Acceso Denegado", "Su rol no tiene módulos asignados.")
+            return
                 
             # Limpiar la ventana y cargar el menú
-            for widget in self.root.winfo_children():
-                widget.destroy()
+        for widget in self.root.winfo_children():
+            widget.destroy()
             
 
-            self.Menu_view = MainMenuView(self.root, self, options, role) 
+        self.Menu_view = MainMenuView(self.root, self, options, role) 
 
 
         # ----------------------------------------------------
@@ -111,20 +89,24 @@ class MainController:
         for widget in self.root.winfo_children():
             widget.destroy()
         self.PacientesMenuPrincipal = PacientesMenuPrincipal()
-        print("✅ Módulo de Programación de Citas cargado.")
+        print("✅ Módulo de gestión de pacientes cargado.")
 
 
     def open_citas_module(self):
         print("Abriendo Programación de Citas...")
         for widget in self.root.winfo_children():
             widget.destroy()
-            # El CitaController automáticamente carga su vista (CitaView)
-        self.cita_controller = CitaController(self.root, self)
+        self.cita_controller = CitaController(self.root, self.current_user)
         print("✅ Módulo de Programación de Citas cargado.")
 
     def open_expediente_module(self):
         print("Abriendo Módulo de Expediente Clínico...")
-        # Aquí iría la lógica para cargar el ExpedienteController
+        for widget in self.root.winfo_children():
+            widget.destroy()
+           
+        self.doctor_controller = DoctorController(self.root, self.current_user)
+        print("✅ Módulo de expedientes médicos cargado.")
+        
             
     def open_facturacion_module(self):
         print("Abriendo Módulo de Facturación y Pagos...")
