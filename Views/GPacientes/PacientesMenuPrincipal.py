@@ -65,7 +65,7 @@ def PacientesMenuPrincipal(root_principal=None):
 
     tk.Label(
         root,
-        text="Elige la accion deseas realizar:",
+        text="Elige la accion deseas realizar",
         bg=PALETA["fondo"],
         fg="#1e4e5a",
         font=("Arial", 13)
