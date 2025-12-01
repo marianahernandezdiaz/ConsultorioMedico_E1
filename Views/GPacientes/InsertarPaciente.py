@@ -11,7 +11,6 @@ PALETA = {
     "accent": "#C29470"
 }
 
-
 def abrir_ventana_insertar_paciente(master, controller):
 
     win = tk.Toplevel(master)
@@ -21,43 +20,44 @@ def abrir_ventana_insertar_paciente(master, controller):
     win.grab_set()  # para que tenga el foco hasta cerrar
 
     # --------- Estilos ttk para botones ----------
-    style = ttk.Style(win)
-    style.theme_use("clam")
+    estilo = ttk.Style(win)
+    estilo.theme_use("clam")
 
-    style.configure(
+    estilo.configure(
         "Primary.TButton",
         background=PALETA["btn_principal"],
         foreground="white",
         padding=6
     )
-    style.map(
+    estilo.map(
         "Primary.TButton",
         background=[("active", PALETA["accent"])]
     )
 
-    style.configure(
+    estilo.configure(
         "Secondary.TButton",
         background=PALETA["btn_secundario"],
         foreground="white",
         padding=6
     )
-    style.map(
+    estilo.map(
         "Secondary.TButton",
         background=[("active", PALETA["header"])]
     )
 
     # --------- Helper para crear filas de etiqueta + entry ----------
-    def add_labeled_entry(parent, label_text, row, width=30):
+    def agregar_entrada_con_etiqueta(parent, texto_etiqueta, fila, ancho=30):
         tk.Label(
             parent,
-            text=label_text,
+            text=texto_etiqueta,
             bg=PALETA["frame"],
-            anchor="w"
-        ).grid(row=row, column=0, sticky="w", pady=5, padx=5)
+            anchor="w",
+            font=("Arial", 12, "bold")  # Etiquetas en Arial, más grandes y en negrita
+        ).grid(row=fila, column=0, sticky="w", pady=5, padx=5)
 
-        entry = tk.Entry(parent, width=width)
-        entry.grid(row=row, column=1, sticky="w", pady=5, padx=5)
-        return entry
+        entrada = tk.Entry(parent, width=ancho, font=("Arial", 12))  # Fuente Arial para las entradas
+        entrada.grid(row=fila, column=1, sticky="w", pady=5, padx=5)
+        return entrada
 
     # --------- Header ----------
     header = tk.Frame(win, bg=PALETA["header"])
@@ -79,29 +79,30 @@ def abrir_ventana_insertar_paciente(master, controller):
     frame_form.columnconfigure(1, weight=1)
 
     # Campos que SÍ existen en la tabla Pacientes
-    entry_nombres = add_labeled_entry(frame_form, "Nombres:", 0)
-    entry_apellidos = add_labeled_entry(frame_form, "Apellidos:", 1)
+    entrada_nombres = agregar_entrada_con_etiqueta(frame_form, "Nombres:", 0)
+    entrada_apellidos = agregar_entrada_con_etiqueta(frame_form, "Apellidos:", 1)
 
     # Fecha de nacimiento (texto simple con formato YYYY-MM-DD)
     tk.Label(
         frame_form,
         text="Fecha de nacimiento (YYYY-MM-DD):",
         bg=PALETA["frame"],
-        anchor="w"
+        anchor="w",
+        font=("Arial", 12, "bold")  # Etiqueta en Arial, más grande y en negrita
     ).grid(row=2, column=0, sticky="w", pady=5, padx=5)
 
-    entry_fecha_nac = tk.Entry(frame_form, width=20)
-    entry_fecha_nac.grid(row=2, column=1, sticky="w", pady=5, padx=5)
+    entrada_fecha_nac = tk.Entry(frame_form, width=20, font=("Arial", 12))  # Entrada en Arial
+    entrada_fecha_nac.grid(row=2, column=1, sticky="w", pady=5, padx=5)
 
-    entry_telefono = add_labeled_entry(frame_form, "Teléfono:", 3)
-    entry_direccion = add_labeled_entry(frame_form, "Dirección:", 4, width=40)
-    entry_seguro = add_labeled_entry(frame_form, "Seguro médico:", 5)
+    entrada_telefono = agregar_entrada_con_etiqueta(frame_form, "Teléfono:", 3)
+    entrada_direccion = agregar_entrada_con_etiqueta(frame_form, "Dirección:", 4, ancho=40)
+    entrada_seguro = agregar_entrada_con_etiqueta(frame_form, "Seguro médico:", 5)
 
     # --------- Guardar ----------
     def guardar_paciente():
-        nombres = entry_nombres.get().strip()
-        apellidos = entry_apellidos.get().strip()
-        fecha_nac = entry_fecha_nac.get().strip()
+        nombres = entrada_nombres.get().strip()
+        apellidos = entrada_apellidos.get().strip()
+        fecha_nac = entrada_fecha_nac.get().strip()
 
         if not nombres or not apellidos or not fecha_nac:
             messagebox.showwarning(
@@ -114,9 +115,9 @@ def abrir_ventana_insertar_paciente(master, controller):
             "nombres": nombres,
             "apellidos": apellidos,
             "fecha_nac": fecha_nac,  # formato 'YYYY-MM-DD'
-            "telefono": entry_telefono.get().strip(),
-            "direccion": entry_direccion.get().strip(),
-            "seguro_med": entry_seguro.get().strip(),
+            "telefono": entrada_telefono.get().strip(),
+            "direccion": entrada_direccion.get().strip(),
+            "seguro_med": entrada_seguro.get().strip(),
         }
 
         try:

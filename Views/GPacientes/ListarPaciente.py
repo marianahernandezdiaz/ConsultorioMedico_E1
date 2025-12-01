@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 
 PALETA = {
-    "header": "#247D7F",
+    "header": "#247D7F",  # Green color for the header
     "fondo": "#B2D9C4",
     "frame": "#80B9C8",
     "btn_principal": "#247D7F",
@@ -65,6 +65,14 @@ def abrir_ventana_listar_pacientes(master, controller):
     tree = ttk.Treeview(frame_main, columns=columns, show="headings", height=15)
     tree.pack(side="left", fill="both", expand=True)
 
+    # Estilo del header (Columnas en verde con letras blancas)
+    style.configure(
+        "Treeview.Heading",
+        background=PALETA["header"],
+        foreground="white",
+        font=("Arial", 10, "bold")
+    )
+
     # Encabezados
     tree.heading("ID_Paciente", text="ID")
     tree.heading("Nombres", text="Nombres")
@@ -109,7 +117,7 @@ def abrir_ventana_listar_pacientes(master, controller):
             tree.insert(
                 "",
                 tk.END,
-                values=(
+                values=( 
                     p["ID_Paciente"],
                     p["Nombres"],
                     p["Apellidos"],
