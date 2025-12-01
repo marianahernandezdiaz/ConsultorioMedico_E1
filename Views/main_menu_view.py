@@ -9,7 +9,7 @@ PALETTE = {
     "warn": "#C29470",
 }
 
-class MainMenuView(tk.Toplevel):
+class MainMenuView_1(tk.Toplevel):
     def __init__(self, master, controller):
         super().__init__(master)
         self.controller = controller

@@ -2,7 +2,8 @@ from Models.user_model import UserModel
 from Views.login_view import LoginView
 from Controllers.doctor_controller import DoctorController
 from Models.cita_Model import CitaModel 
-from Views.login_view import LoginView 
+from Views.login_view import LoginView
+from Views.main_menu_view import MainMenuView_1
 from Views.menu_view import MainMenuView
 from Views.GPacientes.PacientesMenuPrincipal import PacientesMenuPrincipal
 from Controllers.cita_controller import CitaController
@@ -110,7 +111,12 @@ class MainController:
             
     def open_facturacion_module(self):
         print("Abriendo Módulo de Facturación y Pagos...")
-        # Aquí iría la lógica para cargar el FacturacionController
+        for widget in self.root.winfo_children():
+            widget.destroy()
+           
+        self.MainMenuView_1 = MainMenuView_1(self.root, self.current_user)
+        print("✅ Módulo de facturación cargado.")
+        
 
     def open_reportes_module(self):
         print("Abriendo Reportes de Ocupación...")
