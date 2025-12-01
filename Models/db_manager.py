@@ -83,20 +83,23 @@ class DBManager:
                 print(f"Error al ejecutar SELECT: {err}")
                 return []
         return []
-
-    def execute_commit(self, query, params=None):
-        """
-        Ejecuta una consulta SQL de INSERT, UPDATE o DELETE y aplica el COMMIT.
-        Retorna True en caso de éxito, False en caso de error.
-        """
+    
+    def execute_dml(self, query, params=None):
+        """Ejecuta INSERT/UPDATE/DELETE y realiza COMMIT o ROLLBACK."""
         if self.connection and self.connection.is_connected():
             try:
                 self.cursor.execute(query, params)
                 self.connection.commit()
                 return True
             except mysql.connector.Error as err:
-                # Si hay un error, haz ROLLBACK
                 self.connection.rollback()
-                print(f"Error al ejecutar COMMIT ({query}): {err}")
-                return False
+                
+                #Muestra el error específico de MySQL para el debugging
+                print(f" ERROR DML - Sentencia: {query}")
+                print(f"ERROR DML - Parámetros: {params}")
+                print(f"ERROR DE MYSQL (FK o Integridad): {err}") 
+                
+            return False
         return False
+
+
