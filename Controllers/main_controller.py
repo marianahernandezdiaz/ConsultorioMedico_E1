@@ -1,7 +1,8 @@
 from Models.user_model import UserModel
 from Models.cita_Model import CitaModel # Importación CRÍTICA
-from Views.login_view import LoginView # Asumiendo que existe
-from Views.menu_view import MainMenuView # Asumiendo que existe
+from Views.login_view import LoginView 
+from Views.menu_view import MainMenuView
+from Views.GPacientes.PacientesMenuPrincipal import PacientesMenuPrincipal
 from Controllers.cita_controller import CitaController
 from tkinter import messagebox
 import tkinter as tk # Necesario para la clase base del root
@@ -14,7 +15,7 @@ class MainController:
     def __init__(self, root):
         self.root = root
         self.user_model = UserModel()
-        self.cita_model = CitaModel() # 🚨 INICIALIZACIÓN CRÍTICA para validación
+        self.cita_model = CitaModel()
         self.current_user = None 
         
         self.root.geometry("1x1") 
@@ -73,11 +74,9 @@ class MainController:
             for widget in self.root.winfo_children():
                 widget.destroy()
             
-            # 🚨 CORRECCIÓN CRÍTICA DE ERROR y CARGA DE LA VISTA
-            # Se añade el argumento 'role' que faltaba
+
             self.Menu_view = MainMenuView(self.root, self, options, role) 
-            # NOTA: Usé 'self' como controlador para que el menú pueda llamar 
-            # directamente a las funciones open_module.
+
 
         # ----------------------------------------------------
         # MÉTODOS DE ACCESO A MÓDULOS (Endpoints para los botones)
@@ -85,7 +84,11 @@ class MainController:
 
     def open_pacientes_module(self):
         print("Abriendo Módulo de Gestión de Pacientes...")
-        # Aquí iría la lógica para cargar el PacienteController
+        for widget in self.root.winfo_children():
+            widget.destroy()
+        self.PacientesMenuPrincipal = PacientesMenuPrincipal()
+        print("✅ Módulo de Programación de Citas cargado.")
+
 
     def open_citas_module(self):
         print("Abriendo Programación de Citas...")
