@@ -21,10 +21,8 @@ class UserModel:
             R.Nombre_Rol 
         FROM Usuarios U
         JOIN Roles R ON U.ID_Rol = R.ID_Rol
-        WHERE U.Email = %s AND U.Contrasena = %s
+        WHERE U.Email = %s AND U.password = %s
         """
-        # Nota: En una aplicación real, no se pasa la contraseña directamente,
-        # se pasa el hash de la contraseña ingresada por el usuario.
         
         results = self.db.execute_query(query, (email, password_hash))
         

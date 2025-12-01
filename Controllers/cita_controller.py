@@ -1,5 +1,7 @@
 from Models.cita_Model import CitaModel
+# Importar vistas
 from Views.cita_view import CitaView
+from Views.formCitas_view import FormularioCita
 
 class CitaController:
     """Controlador para el módulo de Programación de Citas."""
@@ -8,33 +10,26 @@ class CitaController:
         self.master_view = master_view
         self.main_controller = main_controller
         self.model = CitaModel()
-        self.view = CitaView(master_view, self)
         
-
+        # Cargar la vista principal de Citas (la agenda)
+        self.view = CitaView(master_view, self) 
 
     def get_citas_for_day(self, date):
-        """Solicita las citas para una fecha específica al modelo."""
-        # Se asegura que la fecha se envíe en formato SQL (YYYY-MM-DD)
         return self.model.get_citas_by_day(date)
+        
+    def get_cita_details(self, cita_id):
+        # Llama al modelo para obtener todos los detalles de la cita para la precarga
+        return self.model.get_cita_details(cita_id)
 
     def get_doctors_list(self):
-        """Retorna la lista de doctores disponibles."""
         return self.model.get_all_doctors()
         
     def search_pacientes(self, term):
-        """Realiza la búsqueda de pacientes para el agendamiento."""
         return self.model.search_paciente(term)
 
     def agendar_cita(self, paciente_id, doctor_id, fecha, hora, motivo):
-        """Recibe datos de la vista y llama al modelo para crear la cita."""
-        datos = (paciente_id, doctor_id, fecha, hora, motivo)
-        if self.model.create_cita(datos):
-            return True
-        return False
-
-    def modificar_cita(self, doctor_id, fecha, hora, estado, motivo, cita_id):
-        """Recibe datos y llama al modelo para actualizar la cita."""
-        datos = (doctor_id, fecha, hora, estado, motivo, cita_id)
-        if self.model.update_cita(datos):
-            return True
-        return False
+        # Aquí puedes añadir validaciones de negocio antes de llamar al modelo
+        return self.model.create_cita(paciente_id, doctor_id, fecha, hora, motivo)
+        
+    # Nota: handle_modify_cita se dejará en el MainController para gestionar el flujo principal
+    # pero aquí se podría añadir una versión simple si es necesario.

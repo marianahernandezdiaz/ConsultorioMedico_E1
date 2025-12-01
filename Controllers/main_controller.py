@@ -1,87 +1,120 @@
-
 from Models.user_model import UserModel
-from Views.login_view import LoginView
+from Models.cita_Model import CitaModel # Importación CRÍTICA
+from Views.login_view import LoginView # Asumiendo que existe
+##from Views.main_menu_view import MainMenuView # Asumiendo que existe
 from Controllers.cita_controller import CitaController
+from tkinter import messagebox
+import tkinter as tk # Necesario para la clase base del root
 
-## esta clase manejara la autenticacion y las vistas a las que tiene acceso cada usuario
 class MainController:
     """
-    Controlador central de la aplicación.
-    Maneja el inicio de sesión, la autenticación y el enrutamiento 
-    a los módulos permitidos según el rol.
+    
     """
+    
     def __init__(self, root):
         self.root = root
         self.user_model = UserModel()
-        self.current_user = None  # Almacenará los datos del usuario logueado (ID, Nombre, Rol)
+        self.cita_model = CitaModel() # 🚨 INICIALIZACIÓN CRÍTICA para validación
+        self.current_user = None 
         
-        # 1. Configurar la ventana principal de Tkinter
-        self.root.title("Sistema de Gestión de Consultorio Médico")
-        
-        # 2. Iniciar la vista de Login
+        self.root.geometry("1x1") 
+        self.root.withdraw() 
         self.show_login()
-
+    
     def show_login(self):
-        """Muestra la interfaz de inicio de sesión."""
-        # Cerrar cualquier ventana o menú previo (si aplica)
-        # Aquí iniciaremos la vista de Login, pasándole este controlador
-        # para que la vista pueda llamar al método handle_login
+        self.root.deiconify() 
+        for widget in self.root.winfo_children():
+            widget.destroy()
         self.login_view = LoginView(self.root, self)
         
     def handle_login(self, email, password):
-        """
-        Maneja la solicitud de login desde la vista.
-        """
-        
-        # 1. Llamar al Modelo para autenticar
         user_data = self.user_model.get_user_by_credentials(email, password)
         
         if user_data:
             self.current_user = user_data
-            self.login_view.destroy() # Cerrar la ventana de Login
+            self.login_view.destroy() 
             print(f"✅ Login exitoso. Rol: {self.current_user['Nombre_Rol']}")
-            
-            # 2. Proceder al menú principal/router
-            self.open_citas_module()
-        
+            #self.show_main_menu(self.current_user['Nombre_Rol']) # Ir al menú RBAC
+            self.open_citas_module() # Abrir módulo de citas automáticamente para pruebas
         else:
-            # 3. Notificar a la vista del error
             self.login_view.show_error("Credenciales incorrectas o usuario no encontrado.")
 
     def show_main_menu(self, role):
-        """
-        Carga la vista del menú principal o el módulo directo según el rol.
-        Aquí se implementa el Control de Acceso Basado en Roles (RBAC).
-        """
-        # Nota: Por ahora, solo mostraremos un mensaje, 
-        # pero aquí cargarías la clase views.main_menu_view.py
-        print(f"--- Cargando Menú Principal para {role} ---")
+        # Implementación mínima de RBAC
+        options = []
+        if role in ('Administrador', 'Recepcionista'):
+             options.append(("Programación de Citas", self.open_citas_module))
+        if role == 'Administrador':
+            options.append(("Reportes de Ocupación", self.open_reportes_module))
         
-
-
-    
-    def open_pacientes_module(self):
-        print("Abriendo Gestión de Pacientes...")
-        # Lógica: Cargar views.paciente_view y su controlador.
+        if not options:
+             messagebox.showinfo("Acceso Denegado", "Su rol no tiene módulos asignados.")
+             return
+             
+        # Limpiar la ventana y cargar el menú
+        for widget in self.root.winfo_children():
+            widget.destroy()
         
+        # self.main_menu_view = MainMenuView(self.root, self, options) # Suponiendo esta vista existe
+
     def open_citas_module(self):
         print("Abriendo Programación de Citas...")
         for widget in self.root.winfo_children():
             widget.destroy()
-
-        # Cargar el controlador
+        # El CitaController automáticamente carga su vista (CitaView)
         self.cita_controller = CitaController(self.root, self)
         print("✅ Módulo de Programación de Citas cargado.")
-        
-        
+
     def open_reportes_module(self):
-        if self.current_user and self.current_user['Nombre_Rol'] == 'Administrador':
-            print("Abriendo Reportes de Ocupación...")
+        print("Abriendo Reportes de Ocupación...")
+
+    # =========================================================
+    # 🚨 LÓGICA DE VALIDACIÓN CENTRAL PARA MODIFICACIÓN DE CITAS
+    # =========================================================
+    def handle_modify_cita(self, cita_id, id_doctor, new_fecha, new_hora, new_motivo, new_estado, form_view):
+        """
+        Valida el horario con el modelo y realiza la modificación de la cita.
+        """
+        
+        # 1. Validación de conflicto
+        # Usamos self.cita_model, que inicializamos en __init__
+        is_conflict = self.cita_model.check_cita_conflict(
+            id_cita_to_exclude=cita_id,
+            id_doctor=id_doctor,
+            fecha=new_fecha,
+            hora=new_hora
+        )
+        
+        if is_conflict:
+            messagebox.showerror(
+                "Error de Agenda", 
+                f"El Doctor ya tiene una cita agendada el día {new_fecha} a las {new_hora}."
+            )
+            return
+
+        # 2. Modificación de la cita
+        
+        success = self.cita_model.update_cita(
+                cita_id=cita_id,
+                id_doctor=id_doctor,
+                fecha=new_fecha,
+                hora=new_hora,
+                motivo=new_motivo,
+                estado=new_estado
+            )
+            
+        if success:
+                messagebox.showinfo("Éxito", "Cita modificada correctamente.")
+                form_view.destroy() # Cerrar la ventana modal
+                
+                # 3. Recargar la agenda principal
+                self.cita_controller.view.load_agenda(new_fecha) 
         else:
-            # Esto es una validación de seguridad extra en el controlador
-            print("ACCESO DENEGADO a Reportes.")
+                messagebox.showerror("Error", "No se pudo modificar la cita.")
+
 
     def __del__(self):
-        """Cierra la conexión a la DB al terminar la aplicación."""
         if self.user_model:
-            self.user_model.close_connection()
+            self.user_model.db.close()
+        if self.cita_model:
+            self.cita_model.db.close()

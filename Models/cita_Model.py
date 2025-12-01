@@ -1,54 +1,101 @@
 from .db_manager import DBManager
 
 class CitaModel:
-    """Gestiona el CRUD y las consultas de la tabla Citas."""
+    """Gestiona el CRUD, consultas y validación de la tabla Citas."""
     
     def __init__(self):
         self.db = DBManager()
+        
+    def get_all_doctors(self):
+        """Retorna la lista de usuarios con el rol 'Doctor' (ID_Rol = 3)."""
+        query = "SELECT ID_Usuario, Nombre_usuario FROM Usuarios WHERE ID_Rol = 3"
+        return self.db.execute_query(query)
+
+    def search_paciente(self, search_term):
+        """Busca un paciente por nombre o apellido para el formulario."""
+        term = f'%{search_term}%'
+        
+        # Usamos alias para garantizar que las claves sean 'Nombres' y 'Apellidos'
+        query = """
+        SELECT ID_Paciente, 
+               Nombres AS Nombres, 
+               Apellidos AS Apellidos, 
+               Telefono 
+        FROM pacientes 
+        WHERE Nombres LIKE %s OR Apellidos LIKE %s LIMIT 10
+        """
+        return self.db.execute_query(query, (term, term)) 
 
     def get_citas_by_day(self, date):
         """Retorna todas las citas para un día específico."""
         query = """
         SELECT 
             C.ID_Cita, C.Fecha, C.Hora, C.Estado, C.Motivo,
-            P.Nombre AS Paciente_Nombre, P.Apellidos AS Paciente_Apellido,
+            P.Nombres AS Paciente_Nombre, P.Apellidos AS Paciente_Apellido,
             U.Nombre_usuario AS Doctor_Nombre
-        FROM Citas C
-        JOIN Pacientes P ON C.ID_Paciente = P.ID_Paciente
+        FROM citas C
+        JOIN pacientes P ON C.ID_Paciente = P.ID_Paciente
         JOIN Usuarios U ON C.ID_Doctor = U.ID_Usuario
         WHERE C.Fecha = %s
         ORDER BY C.Hora
         """
-        # La consulta usa JOINs para obtener los nombres completos del paciente y doctor
         return self.db.execute_query(query, (date,))
-        
-    def get_all_doctors(self):
-        """Retorna la lista de usuarios con el rol 'Doctor'."""
-        # Asumiendo que ID_Rol para Doctor es 3 (de tu script de inserción)
-        query = "SELECT ID_Usuario, Nombre_usuario FROM Usuarios WHERE ID_Rol = 3"
-        return self.db.execute_query(query)
 
-    def create_cita(self, datos):
-        """Agenda una nueva cita."""
+    def get_cita_details(self, cita_id):
+        """Retorna todos los detalles de una cita por su ID (fuente de la precarga)."""
         query = """
-        INSERT INTO Citas (ID_Paciente, ID_Doctor, Fecha, Hora, Estado, Motivo) 
+        SELECT 
+            C.ID_Cita,
+            C.ID_Paciente AS ID_Paciente, 
+            C.ID_Doctor,
+            C.Fecha, 
+            C.Hora, 
+            C.Estado, 
+            C.Motivo,
+            P.Nombres AS Paciente_Nombre, 
+            P.Apellidos AS Paciente_Apellido,
+            U.ID_Usuario AS Doctor_ID, 
+            U.Nombre_usuario AS Doctor_Nombre
+        FROM citas C
+        JOIN Pacientes P ON C.ID_Paciente = P.ID_Paciente
+        JOIN Usuarios U ON C.ID_Doctor = U.ID_Usuario
+        WHERE C.ID_Cita = %s
+        """
+        result = self.db.execute_query(query, (cita_id,))
+        return result[0] if result else None
+
+    def create_cita(self, paciente_id, doctor_id, fecha, hora, motivo):
+        """Agenda una nueva cita (DML)."""
+        query = """
+        INSERT INTO citas (ID_Paciente, ID_Doctor, Fecha, Hora, Estado, Motivo) 
         VALUES (%s, %s, %s, %s, 'Agendada', %s)
         """
-        # datos debe ser una tupla: (ID_Paciente, ID_Doctor, Fecha, Hora, Motivo)
-        return self.db.execute_commit(query, datos)
+        datos = (paciente_id, doctor_id, fecha, hora, motivo)
+        return self.db.execute_dml(query, datos)
 
-    def update_cita(self, datos):
-        """Modifica una cita existente."""
-        # datos debe ser una tupla: (ID_Doctor, Fecha, Hora, Estado, Motivo, ID_Cita)
+    def update_cita(self, cita_id, id_doctor, fecha, hora, motivo, estado):
+       
+        cita_id_int = int(cita_id) 
+        id_doctor_int = int(id_doctor) # Asegurar el tipo
         query = """
-        UPDATE Citas 
-        SET ID_Doctor=%s, Fecha=%s, Hora=%s, Estado=%s, Motivo=%s
-        WHERE ID_Cita=%s
+        UPDATE citas 
+        SET ID_Doctor = %s, Fecha = %s, Hora = %s, Motivo = %s, Estado = %s
+        WHERE ID_Cita = %s;
         """
-        return self.db.execute_commit(query, datos)
+        #params = (id_doctor_int, fecha, hora, motivo, estado, cita_id_int)
+        
+        # Llama al ejecutor DML
+        #return self.db.execute_dml(query, params)
 
-    def search_paciente(self, search_term):
-        """Busca un paciente por nombre o apellido para agendar la cita."""
-        term = f'%{search_term}%'
-        query = "SELECT ID_Paciente, Nombre, Apellidos, Telefono FROM Pacientes WHERE Nombre LIKE %s OR Apellidos LIKE %s LIMIT 10"
-        return self.db.execute_query(query, (term, term))
+
+    def check_cita_conflict(self, id_cita_to_exclude, id_doctor, fecha, hora):
+        """Verifica si ya existe una cita para un doctor en ese horario."""
+        query = """
+        SELECT COUNT(*) 
+        FROM citas 
+        WHERE ID_Doctor = %s AND Fecha = %s AND Hora = %s AND ID_Cita != %s;
+        """
+        params = (id_doctor, fecha, hora, id_cita_to_exclude)
+        result = self.db.execute_query(query, params)
+        # Retorna True si hay conflicto (count > 0)
+        return result[0][0] > 0 if result and result[0] else False
