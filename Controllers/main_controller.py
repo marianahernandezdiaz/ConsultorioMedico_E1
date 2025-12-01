@@ -1,7 +1,7 @@
 from Models.user_model import UserModel
 from Models.cita_Model import CitaModel # Importación CRÍTICA
 from Views.login_view import LoginView # Asumiendo que existe
-##from Views.main_menu_view import MainMenuView # Asumiendo que existe
+from Views.menu_view import MainMenuView # Asumiendo que existe
 from Controllers.cita_controller import CitaController
 from tkinter import messagebox
 import tkinter as tk # Necesario para la clase base del root
@@ -34,40 +34,78 @@ class MainController:
             self.current_user = user_data
             self.login_view.destroy() 
             print(f"✅ Login exitoso. Rol: {self.current_user['Nombre_Rol']}")
-            #self.show_main_menu(self.current_user['Nombre_Rol']) # Ir al menú RBAC
-            self.open_citas_module() # Abrir módulo de citas automáticamente para pruebas
+            self.show_main_menu(self.current_user['Nombre_Rol']) # Ir al menú RBAC
         else:
             self.login_view.show_error("Credenciales incorrectas o usuario no encontrado.")
 
     def show_main_menu(self, role):
-        # Implementación mínima de RBAC
-        options = []
-        if role in ('Administrador', 'Recepcionista'):
-             options.append(("Programación de Citas", self.open_citas_module))
-        if role == 'Administrador':
-            options.append(("Reportes de Ocupación", self.open_reportes_module))
-        
-        if not options:
-             messagebox.showinfo("Acceso Denegado", "Su rol no tiene módulos asignados.")
-             return
-             
-        # Limpiar la ventana y cargar el menú
-        for widget in self.root.winfo_children():
-            widget.destroy()
-        
-        # self.main_menu_view = MainMenuView(self.root, self, options) # Suponiendo esta vista existe
+            """
+            Implementa el Control de Acceso Basado en Roles (RBAC) 
+            y carga la vista del menú principal.
+            """
+            options = []
+
+            # 1. Gestión de Pacientes (Administrador, Recepcionista)
+            if role in ('Administrador', 'Recepcionista'):
+                options.append(("1. Gestión de Pacientes", self.open_pacientes_module))
+                
+            # 2. Programación de Citas (Recepcionista)
+            if role == 'Recepcionista':
+                options.append(("2. Programación de Citas", self.open_citas_module))
+                
+            # 3. Expediente Clínico (Doctor)
+            if role == 'Doctor':
+                options.append(("3. Expediente Clínico", self.open_expediente_module))
+
+            # 4. Facturación y Pagos (Administrador, Recepcionista)
+            if role in ('Administrador', 'Recepcionista'):
+                options.append(("4. Facturación y Pagos", self.open_facturacion_module))
+
+            # 5. Reportes de Ocupación (Administrador)
+            if role == 'Administrador':
+                options.append(("5. Reportes de Ocupación", self.open_reportes_module))
+                
+            if not options:
+                messagebox.showinfo("Acceso Denegado", "Su rol no tiene módulos asignados.")
+                return
+                
+            # Limpiar la ventana y cargar el menú
+            for widget in self.root.winfo_children():
+                widget.destroy()
+            
+            # 🚨 CORRECCIÓN CRÍTICA DE ERROR y CARGA DE LA VISTA
+            # Se añade el argumento 'role' que faltaba
+            self.Menu_view = MainMenuView(self.root, self, options, role) 
+            # NOTA: Usé 'self' como controlador para que el menú pueda llamar 
+            # directamente a las funciones open_module.
+
+        # ----------------------------------------------------
+        # MÉTODOS DE ACCESO A MÓDULOS (Endpoints para los botones)
+        # ----------------------------------------------------
+
+    def open_pacientes_module(self):
+        print("Abriendo Módulo de Gestión de Pacientes...")
+        # Aquí iría la lógica para cargar el PacienteController
 
     def open_citas_module(self):
         print("Abriendo Programación de Citas...")
         for widget in self.root.winfo_children():
             widget.destroy()
-        # El CitaController automáticamente carga su vista (CitaView)
+            # El CitaController automáticamente carga su vista (CitaView)
         self.cita_controller = CitaController(self.root, self)
         print("✅ Módulo de Programación de Citas cargado.")
 
+    def open_expediente_module(self):
+        print("Abriendo Módulo de Expediente Clínico...")
+        # Aquí iría la lógica para cargar el ExpedienteController
+            
+    def open_facturacion_module(self):
+        print("Abriendo Módulo de Facturación y Pagos...")
+        # Aquí iría la lógica para cargar el FacturacionController
+
     def open_reportes_module(self):
         print("Abriendo Reportes de Ocupación...")
-
+        # Aquí iría la lógica para cargar el ReportesController
 
 
     def handle_modify_cita(self, cita_id, id_doctor, new_fecha, new_hora, new_motivo, new_estado, form_view):

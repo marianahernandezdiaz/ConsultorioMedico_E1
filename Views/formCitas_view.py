@@ -51,7 +51,7 @@ class FormularioCita(tk.Toplevel):
         style.configure("TEntry", fieldbackground="white")
         
         # Botón de Guardar/Modificar
-        style.configure("Guardar.TButton", background="#44916F", foreground="white", font=('Arial', 10, 'bold'))
+        style.configure("Guardar.TButton", background="#44916F", foreground="#44916F", font=('Arial', 10, 'bold'))
         style.map("Guardar.TButton", background=[('active', '#247D7F')])
 
     def _load_doctors(self):

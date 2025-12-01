@@ -34,10 +34,10 @@ class CitaView(ttk.Frame):
         style = ttk.Style()
         # Colores de tu paleta
         style.configure("Cita.TFrame", background="#B2D9C4") 
-        style.configure("Treeview", background="white", fieldbackground="white", font=('Arial', 10))
-        style.configure("Treeview.Heading", font=('Arial', 10, 'bold'), background="#44916F", foreground="white")
+        style.configure("Treeview", background="white", fieldbackground="#44916F", font=('Arial', 10))
+        style.configure("Treeview.Heading", font=('Arial', 10, 'bold'), background="#44916F", foreground="#44916F")
         style.map("Treeview.Heading", background=[('active', '#247D7F')]) 
-        style.configure("Accent.TButton", background="#44916F", foreground="white", font=('Arial', 10, 'bold'))
+        style.configure("Accent.TButton", background="#44916F", foreground="#44916F", font=('Arial', 10, 'bold'))
         style.map("Accent.TButton", background=[('active', '#247D7F')])
 
 
@@ -62,12 +62,11 @@ class CitaView(ttk.Frame):
         
         # Botón 2: Recargar (llama al mismo manejador)
         ttk.Button(control_frame, 
-                   text="↺ Recargar", 
-                   command=self._handle_load_agenda,
-                   style="Accent.TButton").pack(side="left", padx=5)
+                   text="Recargar", 
+                   command=self._handle_load_agenda).pack(side="left", padx=10)
         
         # Botón 3: Agendar nueva cita
-        ttk.Button(control_frame, text="➕ Agendar Cita", style="Accent.TButton", command=self._open_agendar_form).pack(side="right", padx=10)
+        ttk.Button(control_frame, text="Agendar Cita", command=self._open_agendar_form).pack(side="right", padx=10)
         
         # --- Tabla de Citas (Agenda) ---
         self.agenda_tree = ttk.Treeview(agenda_frame, 
@@ -100,8 +99,7 @@ class CitaView(ttk.Frame):
     def load_agenda(self, date):
         """Carga los datos de las citas desde el controlador y los muestra en el Treeview."""
         
-        # 🚨 CORRECCIÓN CLAVE: Sincroniza la variable de control de la interfaz
-        # Esto es vital cuando el MainController llama a esta función con 'new_fecha'
+        
         self.date_var.set(date) 
         
         # Limpiar datos previos
