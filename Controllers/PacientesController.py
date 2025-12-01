@@ -40,3 +40,9 @@ class PacienteController:
         Elimina un paciente usando el modelo.
         """
         return self.model.eliminar_paciente(id_paciente)
+
+    def listar_pacientes(self):
+        """
+        Pide al modelo la lista completa de pacientes.
+        """
+        return self.model.listar_pacientes()

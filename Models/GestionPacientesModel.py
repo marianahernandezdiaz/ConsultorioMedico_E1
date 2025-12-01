@@ -109,3 +109,17 @@ class GestionPacientesModel:
 
         ok = self.db.execute_commit(sql, params)
         return ok
+
+    def listar_pacientes(self):
+        """
+        Devuelve una lista de todos los pacientes como diccionarios.
+        """
+        sql = """
+            SELECT ID_Paciente, Nombres, Apellidos, Fecha_nac,
+                    Telefono, Direccion, Seguro_Med
+            FROM Pacientes
+            ORDER BY ID_Paciente ASC
+        """
+        resultados = self.db.execute_query(sql)
+        return resultados  # lista de dicts (por cursor dictionary=True)
+

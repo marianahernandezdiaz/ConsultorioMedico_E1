@@ -11,10 +11,19 @@ if BASE_DIR not in sys.path:
 
 from Controllers.PacientesController import PacienteController
 from Views.GPacientes.InsertarPaciente import abrir_ventana_insertar_paciente
-# from Views.GPacientes.BuscarPaciente import abrir_ventana_buscar_paciente
+from Views.GPacientes.BuscarPaciente import abrir_ventana_buscar_paciente
 from Views.GPacientes.ModificarPaciente import abrir_ventana_modificar_paciente
 from Views.GPacientes.EliminarPaciente import abrir_ventana_eliminar_paciente
-# from Views.GPacientes.ListarPaciente import abrir_ventana_listar_pacientes
+from Views.GPacientes.ListarPaciente import abrir_ventana_listar_pacientes
+
+PALETA = {
+    "header": "#247D7F",       # Barra superior / títulos
+    "fondo": "#B2D9C4",        # Fondo de la ventana
+    "frame": "#80B9C8",        # Fondo de contenedores
+    "btn_principal": "#247D7F",
+    "btn_secundario": "#44916F",
+    "accent": "#C29470"
+}
 
 
 def PacientesMenuPrincipal(root_principal=None):
@@ -32,19 +41,24 @@ def PacientesMenuPrincipal(root_principal=None):
 
     root.title("Gestión de Pacientes")
     root.geometry("700x450")
-    root.config(bg="#e3f2fd")
+    root.config(bg=PALETA["fondo"])
 
-    style = ttk.Style()
+    # Estilos ttk
+    style = ttk.Style(root)
     style.theme_use("clam")
 
+    style.configure("Primary.TButton", background=PALETA["btn_principal"], foreground="white", padding=8, font=("Arial", 11, "bold") )
+    style.map("Primary.TButton", background=[("active", PALETA["accent"])]
+    )
+
     # Encabezado
-    header = tk.Frame(root, bg="#42a5f5")
+    header = tk.Frame(root, bg=PALETA["header"])
     header.pack(fill="x")
 
     tk.Label(
         header,
         text="Módulo de Gestión de Pacientes",
-        bg="#42a5f5",
+        bg=PALETA["header"],
         fg="white",
         font=("Arial", 20, "bold")
     ).pack(pady=10)
@@ -52,47 +66,50 @@ def PacientesMenuPrincipal(root_principal=None):
     tk.Label(
         root,
         text="Sistema de gestión de pacientes",
-        bg="#e3f2fd",
-        fg="#1e88e5",
-        font=("Arial", 12)
+        bg=PALETA["fondo"],
+        fg="#1e4e5a",
+        font=("Arial", 13)
     ).pack(pady=10)
 
-    frame_botones = tk.Frame(root, bg="#e3f2fd")
-    frame_botones.pack(pady=20)
+    # Frame de botones central
+    frame_botones = tk.Frame(root, bg=PALETA["frame"], padx=20, pady=20)
+    frame_botones.pack(pady=20, padx=40, fill="x")
 
-    # Botones CRUD (por ahora sin comando)
+    # Botones CRUD
     ttk.Button(
         frame_botones,
         text="Insertar",
-        # command=lambda: print("Insertar paciente (GUI)")
-        command=lambda: abrir_ventana_insertar_paciente(root, controller )
+        style="Primary.TButton",
+        command=lambda: abrir_ventana_insertar_paciente(root, controller)
     ).grid(row=0, column=0, padx=10, pady=10, sticky="ew")
 
     ttk.Button(
         frame_botones,
         text="Buscar",
-        command=lambda: print("Buscar paciente (WIP)")
+        style="Primary.TButton",
+        command=lambda: abrir_ventana_buscar_paciente(root, controller)
     ).grid(row=0, column=1, padx=10, pady=10, sticky="ew")
 
     ttk.Button(
         frame_botones,
         text="Modificar",
-        # command=lambda: print("Modificar paciente (WIP)")
+        style="Primary.TButton",
         command=lambda: abrir_ventana_modificar_paciente(root, controller)
     ).grid(row=1, column=0, padx=10, pady=10, sticky="ew")
 
     ttk.Button(
         frame_botones,
         text="Eliminar",
-        # command=lambda: print("Eliminar paciente (WIP)")
+        style="Primary.TButton",
         command=lambda: abrir_ventana_eliminar_paciente(root, controller)
     ).grid(row=1, column=1, padx=10, pady=10, sticky="ew")
 
     ttk.Button(
         frame_botones,
         text="Listar",
-        command=lambda: print("Listar pacientes (WIP)")
-    ).grid(row=2, column=0, columnspan=2, padx=10, pady=10, sticky="ew")
+        style="Primary.TButton",
+        command=lambda: abrir_ventana_listar_pacientes(root, controller)
+    ).grid(row=2, column=0, columnspan=2, padx=10, pady=(15, 5), sticky="ew")
 
     for i in range(2):
         frame_botones.columnconfigure(i, weight=1)
@@ -101,6 +118,5 @@ def PacientesMenuPrincipal(root_principal=None):
         root.mainloop()
 
 
-# ESTA PARTE FALTABA
 if __name__ == "__main__":
     PacientesMenuPrincipal()
