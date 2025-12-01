@@ -1,4 +1,6 @@
 from Models.user_model import UserModel
+from Views.login_view import LoginView
+from Controllers.doctor_controller import DoctorController
 from Models.cita_Model import CitaModel # Importación CRÍTICA
 from Views.login_view import LoginView 
 from Views.menu_view import MainMenuView
@@ -40,6 +42,28 @@ class MainController:
             self.login_view.show_error("Credenciales incorrectas o usuario no encontrado.")
 
     def show_main_menu(self, role):
+        """
+        Carga la vista del menú principal o el módulo directo según el rol.
+        Aquí se implementa el Control de Acceso Basado en Roles (RBAC).
+        """
+        # Nota: Por ahora, solo mostraremos un mensaje, 
+        # pero aquí cargarías la clase views.main_menu_view.py
+        print(f"--- Cargando Menú Principal para {role} ---")
+        
+        # Ejemplo de lógica de ruteo:
+        if role == 'Doctor':
+            # Si es Doctor, puede que queramos llevarlo directamente a su módulo de Expediente.
+            self.doctor_controller = DoctorController(self.root, self.current_user)
+            print("Abriendo Módulo de Expediente Clínico...")
+            # Aquí se crearía una instancia de views.expediente_view
+        else:
+            # Para Administrador y Recepcionista, cargamos el menú con opciones.
+            # Aquí se crearía una instancia de views.main_menu_view
+            print(f"Cargando menú con opciones permitidas para {role}...")
+
+    # --- Métodos de Enrutamiento (Stubs) ---
+    # Estos métodos serían llamados por los botones en main_menu_view
+    
             """
             Implementa el Control de Acceso Basado en Roles (RBAC) 
             y carga la vista del menú principal.
