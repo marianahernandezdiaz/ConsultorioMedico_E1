@@ -222,48 +222,45 @@ class FormularioCita(tk.Toplevel):
 
     def _handle_modification(self):
         """Recoge los datos, valida tipos y llama al MainController."""
-        try:
+        
             # --- 1. Extracción y Conversión de IDs (Asegurando INT) ---
-            doctor_key = self.selected_doctor_id.get()
-            if not doctor_key or doctor_key == "No hay doctores disponibles":
-                messagebox.showwarning("Error", "Debe seleccionar un doctor válido.")
-                return
+        doctor_key = self.selected_doctor_id.get()
+        if not doctor_key or doctor_key == "No hay doctores disponibles":
+            messagebox.showwarning("Error", "Debe seleccionar un doctor válido.")
+            return
 
-            doctor_id_str = self.doctor_map.get(doctor_key)
-            doctor_id = int(doctor_id_str) # 👈 Conversión a INT
-            cita_id = int(self.cita_data['ID_Cita']) # 👈 Conversión a INT
+        doctor_id_str = self.doctor_map.get(doctor_key)
+        doctor_id = int(doctor_id_str) 
+        cita_id = int(self.cita_data['ID_Cita']) 
 
             # --- 2. Corrección del Formato de Hora ---
-            new_hora_raw = self.time_var.get()
+        new_hora_raw = self.time_var.get()
             
             # Si el formato es HH:MM (5 caracteres), le añadimos los segundos (:00)
-            if len(new_hora_raw) == 5: 
-                new_hora = new_hora_raw + ":00" # 👈 CORRECCIÓN DE FORMATO
-            else:
-                new_hora = new_hora_raw
+        if len(new_hora_raw) == 5: 
+            new_hora = new_hora_raw + ":00" 
+        else:
+            new_hora = new_hora_raw
                 
             # --- 3. Recoger el resto de valores ---
-            new_fecha = self.date_var.get()
-            new_motivo = self.motivo_var.get()
-            new_estado = self.estado_var.get()
+        new_fecha = self.date_var.get()
+        new_motivo = self.motivo_var.get()
+        new_estado = self.estado_var.get()
             
             # ... (Validaciones adicionales aquí)
 
             # Llamada al controlador principal
-            self.main_controller.handle_modify_cita(
-                cita_id=cita_id,
-                id_doctor=doctor_id,
-                new_fecha=new_fecha,
-                new_hora=new_hora, # 👈 Se usa la hora corregida
-                new_motivo=new_motivo,
-                new_estado=new_estado,
-                form_view=self 
+        self.main_controller.handle_modify_cita(
+            cita_id=cita_id,
+            id_doctor=doctor_id,
+            new_fecha=new_fecha,
+            new_hora=new_hora, 
+            new_motivo=new_motivo,
+            new_estado=new_estado,
+            form_view=self 
             )
             
-        except ValueError:
-            messagebox.showerror("Error de Datos", "El formato de un campo numérico (ID de Doctor/Cita) es incorrecto.")
-        except Exception as e:
-            messagebox.showerror("Error Inesperado", f"Ocurrió un error al procesar la solicitud: {e}")
+        
             
     def destroy(self):
         self.grab_release()

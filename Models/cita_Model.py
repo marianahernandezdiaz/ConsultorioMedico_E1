@@ -82,10 +82,10 @@ class CitaModel:
         SET ID_Doctor = %s, Fecha = %s, Hora = %s, Motivo = %s, Estado = %s
         WHERE ID_Cita = %s;
         """
-        #params = (id_doctor_int, fecha, hora, motivo, estado, cita_id_int)
+        params = (id_doctor_int, fecha, hora, motivo, estado, cita_id_int)
         
         # Llama al ejecutor DML
-        #return self.db.execute_dml(query, params)
+        return self.db.execute_dml(query, params)
 
 
     def check_cita_conflict(self, id_cita_to_exclude, id_doctor, fecha, hora):
@@ -97,5 +97,14 @@ class CitaModel:
         """
         params = (id_doctor, fecha, hora, id_cita_to_exclude)
         result = self.db.execute_query(query, params)
-        # Retorna True si hay conflicto (count > 0)
-        return result[0][0] > 0 if result and result[0] else False
+        
+        if result and result[0]:
+            # El resultado es [{ 'COUNT(*)': 1 }]
+            conflict_count = result[0]['COUNT(*)']
+            return conflict_count > 0
+        else:
+            return False
+        
+        
+        
+    
