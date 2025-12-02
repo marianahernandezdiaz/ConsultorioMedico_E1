@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 
 PALETTE = {
     "primary": "#247D7F",
@@ -53,10 +53,18 @@ class MainMenuView(tk.Toplevel):
         self.grab_set()
 
     def _open_facturacion(self):
-        self.controller.open_facturacion_module()
+        func = getattr(self.controller, "open_facturacion_module", None)
+        if callable(func):
+            func()
+        else:
+            messagebox.showerror("Error", "Controlador inválido para Facturación", parent=self)
 
     def _open_pagos(self):
-        self.controller.open_pagos_module()
+        func = getattr(self.controller, "open_pagos_module", None)
+        if callable(func):
+            func()
+        else:
+            messagebox.showerror("Error", "Controlador inválido para Pagos", parent=self)
 
     def _close(self):
         self.grab_release()
