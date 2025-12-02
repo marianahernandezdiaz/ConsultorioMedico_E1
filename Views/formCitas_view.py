@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from datetime import datetime
 
+
 class FormularioCita(tk.Toplevel):
     """
     Ventana modal para Agendar o Modificar Citas.
@@ -159,7 +160,7 @@ class FormularioCita(tk.Toplevel):
         self.estado_var.set(data['Estado']) 
 
     # =========================================================
-    # 🚨 MANEJADORES DE OPERACIONES
+    # MANEJADORES DE OPERACIONES
     # =========================================================
     
     def _search_paciente(self):
@@ -250,7 +251,7 @@ class FormularioCita(tk.Toplevel):
             # ... (Validaciones adicionales aquí)
 
             # Llamada al controlador principal
-        self.main_controller.handle_modify_cita(
+        self.cita_controller.handle_modify_cita(
             cita_id=cita_id,
             id_doctor=doctor_id,
             new_fecha=new_fecha,
@@ -259,8 +260,6 @@ class FormularioCita(tk.Toplevel):
             new_estado=new_estado,
             form_view=self 
             )
-            
-        
             
     def destroy(self):
         self.grab_release()
