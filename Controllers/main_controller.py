@@ -5,6 +5,8 @@ from Models.cita_Model import CitaModel
 from Views.login_view import LoginView
 from Views.main_menu_view import MainMenuView_1
 from Views.menu_view import MainMenuView
+from Views.facturacion_view import FacturacionView
+from Views.pagos_view import PagosView
 from Views.GPacientes.PacientesMenuPrincipal import PacientesMenuPrincipal
 from Views.reportes_view import ReportesView
 from Controllers.cita_controller import CitaController
@@ -64,7 +66,7 @@ class MainController:
 
             # 4. Facturación y Pagos (Administrador, Recepcionista)
         if role in ('Administrador', 'Recepcionista'):
-            options.append(("4. Facturación y Pagos", self.open_facturacion_module))
+            options.append(("4. Facturación y Pagos", self.open_facturacion_menu))
 
             # 5. Reportes de Ocupación (Administrador)
         if role == 'Administrador':
@@ -110,13 +112,22 @@ class MainController:
         print("✅ Módulo de expedientes médicos cargado.")
         
             
-    def open_facturacion_module(self):
-        print("Abriendo Módulo de Facturación y Pagos...")
+    def open_facturacion_menu(self):
+        print("Abriendo menú de Facturación y Pagos...")
         for widget in self.root.winfo_children():
             widget.destroy()
-           
-        self.MainMenuView_1 = MainMenuView_1(self.root, self.current_user)
-        print("✅ Módulo de facturación cargado.")
+        self.facturacion_pagos_menu = MainMenuView_1(self.root, self)
+        print("✅ Submenú de Facturación/Pagos abierto.")
+
+    def open_facturacion_module(self):
+        print("Abriendo Facturación...")
+        self.facturacion_view = FacturacionView(self.root)
+        print("✅ Vista de Facturación cargada.")
+
+    def open_pagos_module(self):
+        print("Abriendo Pagos...")
+        self.pagos_view = PagosView(self.root)
+        print("✅ Vista de Pagos cargada.")
         
 
     def open_reportes_module(self):
