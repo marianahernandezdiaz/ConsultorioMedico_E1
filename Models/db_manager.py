@@ -19,7 +19,7 @@ class DBManager:
             
             # Verifica si la conexión fue exitosa
             if self.connection.is_connected():
-                print(f"✅ Conexión a la base de datos '{DB_CONFIG['database']}' exitosa.")
+                print(f"Conexión a la base de datos '{DB_CONFIG['database']}' exitosa.")
                 self.cursor = self.connection.cursor(dictionary=True) 
                 try:
                     self.init_schema()
@@ -81,7 +81,7 @@ class DBManager:
                 self.connection.close()
             except Exception:
                 pass
-            print("🔌 Conexión a MySQL cerrada.")
+            print("Conexión a MySQL cerrada.")
             
     # --- Métodos de Utilidad para Ejecutar Consultas ---
     
