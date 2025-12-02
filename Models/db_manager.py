@@ -1,5 +1,8 @@
-import mysql.connector
-from config import DB_CONFIG # Importamos la configuración
+try:
+    import mysql.connector
+except Exception:
+    mysql = None
+from config import DB_CONFIG
 ## Clase para gestionar la conexión a la base de datos MySQL
 class DBManager:
     """
@@ -13,6 +16,9 @@ class DBManager:
         self.connection = None
         self.cursor = None
         
+        if mysql is None:
+            print("Conector MySQL no disponible. Instale mysql-connector-python.")
+            return
         try:
             # Intenta establecer la conexión usando las credenciales de config.py
             self.connection = mysql.connector.connect(**DB_CONFIG)
@@ -33,7 +39,7 @@ class DBManager:
             else:
                 print("No se pudo conectar a la base de datos.")
 
-        except mysql.connector.Error as err:
+        except Exception as err:
             print(f"Error al conectar a MySQL: {err}")
             if err.errno == 1049:
                 self._create_database()
@@ -48,6 +54,9 @@ class DBManager:
         temp_config = DB_CONFIG.copy()
         db_name = temp_config.pop('database')
         
+        if mysql is None:
+            print("Conector MySQL no disponible. No se puede crear la base de datos.")
+            return
         try:
             temp_conn = mysql.connector.connect(**temp_config)
             temp_cursor = temp_conn.cursor()
@@ -62,7 +71,7 @@ class DBManager:
             
             self.__init__() # Reintentar la conexión completa
             
-        except mysql.connector.Error as err:
+        except Exception as err:
             print(f"Error fatal al intentar crear la base de datos: {err}")
             print("Por favor, verifica tus permisos de usuario o crea la base de datos manualmente.")
 
@@ -94,7 +103,7 @@ class DBManager:
             try:
                 self.cursor.execute(query, params)
                 return self.cursor.fetchall()
-            except mysql.connector.Error as err:
+            except Exception as err:
                 print(f"Error al ejecutar SELECT: {err}")
                 return []
         return []
@@ -109,8 +118,7 @@ class DBManager:
                 self.cursor.execute(query, params)
                 self.connection.commit()
                 return True
-            except mysql.connector.Error as err:
-                # Si hay un error, haz ROLLBACK
+            except Exception as err:
                 self.connection.rollback()
                 print(f"Error al ejecutar COMMIT ({query}): {err}")
                 return False
@@ -136,7 +144,7 @@ class DBManager:
                 self.cursor.execute(s)
                 self.connection.commit()
             return True
-        except mysql.connector.Error as err:
+        except Exception as err:
             print(f"Error al inicializar esquema: {err}")
             return False
 
