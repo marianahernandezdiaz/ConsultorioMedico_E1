@@ -1,39 +1,52 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+from tema_config import THEME
 
 from Models.factura_model import FacturaModel
 
-PALETTE = {
-    "primary": "#247D7F",
-    "secondary": "#44916F",
-    "accent": "#B2D9C4",
-    "bg": "#80B9C8",
-    "warn": "#C29470",
-}
+PALETTE = THEME
 
-class PagosView(tk.Toplevel):
-    def __init__(self, master):
+class PagosView(ttk.Frame):
+    def __init__(self, master, controller=None):
         super().__init__(master)
+        self.master = master
+        self.controller = controller
         self.model = FacturaModel()
 
-        self.title("Pagos")
-        self.geometry("700x450")
-        self.configure(bg=PALETTE["bg"])
+        master.title("Pagos")
+        master.geometry("850x550")
+        master.configure(bg=PALETTE["bg"])
+
         style = ttk.Style()
         style.theme_use("clam")
-        style.configure("TFrame", background=PALETTE["bg"]) 
-        style.configure("TLabel", background=PALETTE["bg"], foreground="#0F3D3E")
-        style.configure("Primary.TButton", padding=8, foreground="white", background=PALETTE["primary"]) 
+        style.configure("TFrame", background=PALETTE["bg"])
+        style.configure("TLabel", background=PALETTE["bg"], foreground=PALETTE["text"], font=("Segoe UI", 10))
+        style.configure("Primary.TButton", padding=10, foreground="white", background=PALETTE["primary"], font=("Segoe UI", 10))
         style.map("Primary.TButton", background=[("active", PALETTE["secondary"])])
-        style.configure("Treeview", background="#FFFFFF", fieldbackground="#FFFFFF")
-        style.configure("Treeview.Heading", background=PALETTE["accent"], foreground="#0F3D3E", font=("Arial", 11, "bold"))
+        style.configure("Treeview", background=PALETTE["white"], fieldbackground=PALETTE["white"], font=("Segoe UI", 10), rowheight=28)
+        style.configure("Treeview.Heading", background=PALETTE["primary"], foreground="white", font=("Segoe UI", 10, "bold"))
         style.map("Treeview", background=[("selected", PALETTE["primary"])], foreground=[("selected", "white")])
+
+        self.pack(expand=True, fill="both")
+
+        # Header
+        header = tk.Frame(self, bg=PALETTE["primary"])
+        header.pack(fill="x")
+        tk.Label(header, text="Gestión de Pagos", bg=PALETTE["primary"], fg="white",
+                font=("Segoe UI", 20, "bold")).pack(pady=20)
 
         top = ttk.Frame(self)
         top.pack(fill="x", padx=10, pady=10)
         ttk.Button(top, text="Ver Pendientes", style="Primary.TButton", command=self.load_pendientes).pack(side="left", padx=5)
         ttk.Button(top, text="Ver Todas", style="Primary.TButton", command=self.load_todas).pack(side="left", padx=5)
-        ttk.Button(top, text="Marcar Pagado", style="Primary.TButton", command=self.mark_pagado).pack(side="right")
+        ttk.Button(top, text="Marcar Pagado", style="Primary.TButton", command=self.mark_pagado).pack(side="right", padx=5)
+
+        # Botón Volver
+        if self.controller:
+            ttk.Button(top, text="← Volver", style="Primary.TButton", command=self.controller.open_facturacion_menu).pack(side="right", padx=5)
 
         cols = ("ID", "Paciente", "Total", "Estado")
         self.tree = ttk.Treeview(self, columns=cols, show="headings", height=15)
@@ -43,9 +56,6 @@ class PagosView(tk.Toplevel):
         self.tree.pack(fill="both", expand=True, padx=10, pady=10)
 
         self.load_pendientes()
-
-        self.transient(master)
-        self.grab_set()
 
     def load_todas(self):
         rows = self.model.list_facturas()
@@ -75,5 +85,4 @@ class PagosView(tk.Toplevel):
 
     def destroy(self):
         self.model.close()
-        self.grab_release()
         super().destroy()

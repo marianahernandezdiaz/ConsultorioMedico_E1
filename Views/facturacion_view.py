@@ -1,36 +1,45 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 from datetime import date
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+from tema_config import THEME
 
 from Models.factura_model import FacturaModel
 
-PALETTE = {
-    "primary": "#247D7F",
-    "secondary": "#44916F",
-    "accent": "#B2D9C4",
-    "bg": "#80B9C8",
-    "warn": "#C29470",
-}
+PALETTE = THEME
 
-class FacturacionView(tk.Toplevel):
-    def __init__(self, master):
+class FacturacionView(ttk.Frame):
+    def __init__(self, master, controller=None):
         super().__init__(master)
+        self.master = master
+        self.controller = controller
         self.model = FacturaModel()
         self.items = []
 
-        self.title("Facturación")
-        self.geometry("700x500")
-        self.configure(bg=PALETTE["bg"])
+        master.title("Facturación")
+        master.geometry("850x600")
+        master.configure(bg=PALETTE["bg"])
+
         style = ttk.Style()
         style.theme_use("clam")
-        style.configure("TFrame", background=PALETTE["bg"]) 
-        style.configure("TLabel", background=PALETTE["bg"], foreground="#0F3D3E")
-        style.configure("Form.TEntry", fieldbackground="#FFFFFF")
-        style.configure("Primary.TButton", padding=8, foreground="white", background=PALETTE["primary"]) 
+        style.configure("TFrame", background=PALETTE["bg"])
+        style.configure("TLabel", background=PALETTE["bg"], foreground=PALETTE["text"], font=("Segoe UI", 10))
+        style.configure("Form.TEntry", fieldbackground=PALETTE["white"], font=("Segoe UI", 10))
+        style.configure("Primary.TButton", padding=10, foreground="white", background=PALETTE["primary"], font=("Segoe UI", 10))
         style.map("Primary.TButton", background=[("active", PALETTE["secondary"])])
-        style.configure("Treeview", background="#FFFFFF", fieldbackground="#FFFFFF")
-        style.configure("Treeview.Heading", background=PALETTE["accent"], foreground="#0F3D3E", font=("Arial", 11, "bold"))
+        style.configure("Treeview", background=PALETTE["white"], fieldbackground=PALETTE["white"], font=("Segoe UI", 10), rowheight=28)
+        style.configure("Treeview.Heading", background=PALETTE["primary"], foreground="white", font=("Segoe UI", 10, "bold"))
         style.map("Treeview", background=[("selected", PALETTE["primary"])], foreground=[("selected", "white")])
+
+        self.pack(expand=True, fill="both")
+
+        # Header
+        header = tk.Frame(self, bg=PALETTE["primary"])
+        header.pack(fill="x")
+        tk.Label(header, text="Facturación", bg=PALETTE["primary"], fg="white",
+                font=("Segoe UI", 20, "bold")).pack(pady=20)
 
         top = ttk.Frame(self)
         top.pack(fill="x", padx=10, pady=10)
@@ -87,10 +96,12 @@ class FacturacionView(tk.Toplevel):
         self.total_var = tk.StringVar(value="0.00")
         ttk.Label(bottom, text="Total:").pack(side="left")
         ttk.Label(bottom, textvariable=self.total_var, font=("Arial", 12, "bold")).pack(side="left", padx=10)
-        ttk.Button(bottom, text="Guardar Factura", style="Primary.TButton", command=self.save_factura).pack(side="right")
 
-        self.transient(master)
-        self.grab_set()
+        # Botón Volver
+        if self.controller:
+            ttk.Button(bottom, text="← Volver", style="Primary.TButton", command=self.controller.open_facturacion_menu).pack(side="right", padx=5)
+
+        ttk.Button(bottom, text="Guardar Factura", style="Primary.TButton", command=self.save_factura).pack(side="right")
 
     def add_item(self):
         s = self.serv_entry.get().strip()
@@ -165,5 +176,4 @@ class FacturacionView(tk.Toplevel):
 
     def destroy(self):
         self.model.close()
-        self.grab_release()
         super().destroy()

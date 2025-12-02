@@ -3,10 +3,11 @@ from Models.doctor_model import DoctorModel
 from Views.doctor_view import DoctorView
 
 class DoctorController:
-    def __init__(self, root, user_data):
+    def __init__(self, root, user_data, main_controller=None):
         self.root = root
+        self.main_controller = main_controller
         self.doctor_id = user_data['ID_Usuario']
-        
+
         self.model = DoctorModel()
         self.view = DoctorView(self.root, self, user_data['Nombre_usuario'])
         

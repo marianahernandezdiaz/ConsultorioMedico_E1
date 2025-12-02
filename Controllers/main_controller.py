@@ -5,6 +5,8 @@ from Models.cita_Model import CitaModel
 from Views.login_view import LoginView
 from Views.main_menu_view import MainMenuView_1
 from Views.menu_view import MainMenuView
+from Views.facturacion_view import FacturacionView
+from Views.pagos_view import PagosView
 from Views.GPacientes.PacientesMenuPrincipal import PacientesMenuPrincipal
 from Views.reportes_view import ReportesView
 from Controllers.cita_controller import CitaController
@@ -64,7 +66,7 @@ class MainController:
 
             # 4. Facturación y Pagos (Administrador, Recepcionista)
         if role in ('Administrador', 'Recepcionista'):
-            options.append(("4. Facturación y Pagos", self.open_facturacion_module))
+            options.append(("4. Facturación y Pagos", self.open_facturacion_menu))
 
             # 5. Reportes de Ocupación (Administrador)
         if role == 'Administrador':
@@ -79,8 +81,16 @@ class MainController:
             widget.destroy()
             
 
-        self.Menu_view = MainMenuView(self.root, self, options, role) 
+        self.Menu_view = MainMenuView(self.root, self, options, role)
 
+    def go_back_to_main_menu(self):
+        """
+        Vuelve al menú principal según el rol del usuario actual.
+        """
+        if self.current_user:
+            self.show_main_menu(self.current_user['Nombre_Rol'])
+        else:
+            self.show_login()
 
         # ----------------------------------------------------
         # MÉTODOS DE ACCESO A MÓDULOS (Endpoints para los botones)
@@ -90,7 +100,7 @@ class MainController:
         print("Abriendo Módulo de Gestión de Pacientes...")
         for widget in self.root.winfo_children():
             widget.destroy()
-        self.PacientesMenuPrincipal = PacientesMenuPrincipal()
+        self.PacientesMenuPrincipal = PacientesMenuPrincipal(self.root, self)
         print("✅ Módulo de gestión de pacientes cargado.")
 
 
@@ -98,33 +108,46 @@ class MainController:
         print("Abriendo Programación de Citas...")
         for widget in self.root.winfo_children():
             widget.destroy()
-        self.cita_controller = CitaController(self.root, self.current_user)
+        self.cita_controller = CitaController(self.root, self)
         print("✅ Módulo de Programación de Citas cargado.")
 
     def open_expediente_module(self):
         print("Abriendo Módulo de Expediente Clínico...")
         for widget in self.root.winfo_children():
             widget.destroy()
-           
-        self.doctor_controller = DoctorController(self.root, self.current_user)
+
+        self.doctor_controller = DoctorController(self.root, self.current_user, self)
         print("✅ Módulo de expedientes médicos cargado.")
         
             
-    def open_facturacion_module(self):
-        print("Abriendo Módulo de Facturación y Pagos...")
+    def open_facturacion_menu(self):
+        print("Abriendo menú de Facturación y Pagos...")
         for widget in self.root.winfo_children():
             widget.destroy()
-           
-        self.MainMenuView_1 = MainMenuView_1(self.root, self.current_user)
-        print("✅ Módulo de facturación cargado.")
+        self.facturacion_pagos_menu = MainMenuView_1(self.root, self)
+        print("✅ Submenú de Facturación/Pagos abierto.")
+
+    def open_facturacion_module(self):
+        print("Abriendo Facturación...")
+        for widget in self.root.winfo_children():
+            widget.destroy()
+        self.facturacion_view = FacturacionView(self.root, self)
+        print("✅ Vista de Facturación cargada.")
+
+    def open_pagos_module(self):
+        print("Abriendo Pagos...")
+        for widget in self.root.winfo_children():
+            widget.destroy()
+        self.pagos_view = PagosView(self.root, self)
+        print("✅ Vista de Pagos cargada.")
         
 
     def open_reportes_module(self):
         print("Abriendo Reportes de Ocupación...")
         for widget in self.root.winfo_children():
             widget.destroy()
-           
-        self.open_reportes_module = ReportesView(self.root)
+
+        self.reportes_view = ReportesView(self.root, self)
         print("✅ Módulo de reportes cargado.")
 
 

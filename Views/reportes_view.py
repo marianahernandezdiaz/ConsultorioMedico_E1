@@ -1,27 +1,27 @@
 import tkinter as tk
 from tkinter import ttk
 from datetime import date, timedelta
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+from tema_config import THEME
 from Models.db_manager import DBManager
 
-PALETTE = {
-    "primary": "#247D7F",
-    "accent": "#44916F",
-    "bg": "#B2D9C4",
-    "muted": "#80B9C8",
-    "contrast": "#C29470",
-}
+PALETTE = THEME
 
-class ReportesView(tk.Toplevel):
-    def __init__(self, master):
+class ReportesView(tk.Frame):
+    def __init__(self, master, controller=None):
         super().__init__(master)
-        self.title("Reportes de Ocupación")
-        self.geometry("900x620")
-        self.resizable(False, False)
-        self.transient(master)
-        self.grab_set()
+        self.master = master
+        self.controller = controller
+        master.title("Reportes de Ocupación")
+        master.geometry("1000x680")
+        master.resizable(False, False)
+        master.config(bg=PALETTE["bg"])
         self.db = DBManager()
 
         self.configure(bg=PALETTE["bg"])
+        self.pack(expand=True, fill="both")
         self.columnconfigure(0, weight=1)
         self._build_header()
         self._build_filters()
@@ -33,18 +33,22 @@ class ReportesView(tk.Toplevel):
         header = tk.Frame(self, bg=PALETTE["primary"])
         header.grid(row=0, column=0, sticky="ew")
         header.columnconfigure(0, weight=1)
-        title = tk.Label(header, text="Reportes de Ocupación", fg="white", bg=PALETTE["primary"], font=("Arial", 16, "bold"))
-        title.grid(row=0, column=0, padx=16, pady=12, sticky="w")
+        title = tk.Label(header, text="Reportes de Ocupación", fg="white", bg=PALETTE["primary"], font=("Segoe UI", 20, "bold"))
+        title.grid(row=0, column=0, padx=20, pady=20, sticky="w")
 
     def _build_filters(self):
         bar = tk.Frame(self, bg=PALETTE["bg"])
-        bar.grid(row=1, column=0, sticky="ew", padx=16, pady=8)
-        ttk.Label(bar, text="Rango:").grid(row=0, column=0, padx=(0,8))
-        self.range_cb = ttk.Combobox(bar, values=["Hoy", "Últimos 7 días", "Este mes", "Todo"], state="readonly")
+        bar.grid(row=1, column=0, sticky="ew", padx=20, pady=15)
+        ttk.Label(bar, text="Rango:", font=("Segoe UI", 10, "bold")).grid(row=0, column=0, padx=(0,10))
+        self.range_cb = ttk.Combobox(bar, values=["Hoy", "Últimos 7 días", "Este mes", "Todo"],
+                                     state="readonly", font=("Segoe UI", 10), width=18)
         self.range_cb.current(1)
         self.range_cb.grid(row=0, column=1)
-        self.update_btn = ttk.Button(bar, text="Actualizar", command=self._refresh)
-        self.update_btn.grid(row=0, column=2, padx=8)
+
+        style = ttk.Style()
+        style.configure("Report.TButton", padding=8, font=("Segoe UI", 10))
+        self.update_btn = ttk.Button(bar, text="Actualizar", command=self._refresh, style="Report.TButton")
+        self.update_btn.grid(row=0, column=2, padx=10)
 
     def _build_kpis(self):
         wrap = tk.Frame(self, bg=PALETTE["bg"]) 
@@ -57,11 +61,11 @@ class ReportesView(tk.Toplevel):
         self.kpi_promedio = self._kpi_card(wrap, 3, "Promedio día", PALETTE["contrast"]) 
 
     def _kpi_card(self, parent, col, title, color):
-        frame = tk.Frame(parent, bg=color)
+        frame = tk.Frame(parent, bg=color, relief=tk.FLAT, bd=1)
         frame.grid(row=0, column=col, sticky="ew", padx=8, pady=8)
-        tk.Label(frame, text=title, bg=color, fg="white", font=("Arial", 11, "bold")).pack(anchor="w", padx=10, pady=(10,0))
-        value = tk.Label(frame, text="-", bg=color, fg="white", font=("Arial", 20, "bold"))
-        value.pack(anchor="w", padx=10, pady=(0,10))
+        tk.Label(frame, text=title, bg=color, fg="white", font=("Segoe UI", 10, "bold")).pack(anchor="w", padx=15, pady=(15,0))
+        value = tk.Label(frame, text="-", bg=color, fg="white", font=("Segoe UI", 22, "bold"))
+        value.pack(anchor="w", padx=15, pady=(5,15))
         return value
 
     def _build_tables(self):
@@ -94,7 +98,15 @@ class ReportesView(tk.Toplevel):
         self.doc_tv.column("prod", width=60, anchor="center")
         self.doc_tv.grid(row=1, column=0, sticky="nsew")
 
-        ttk.Button(self, text="Cerrar", command=self._close).grid(row=4, column=0, pady=(0,16))
+        # Frame para botones
+        btn_frame = ttk.Frame(self)
+        btn_frame.grid(row=4, column=0, pady=(0,16))
+
+        # Botón Volver
+        if self.controller:
+            ttk.Button(btn_frame, text="← Volver al Menú", command=self.controller.go_back_to_main_menu).pack(side="left", padx=5)
+
+        ttk.Button(btn_frame, text="Cerrar", command=self._close).pack(side="left", padx=5)
 
     def _range_dates(self):
         today = date.today()
@@ -158,4 +170,4 @@ class ReportesView(tk.Toplevel):
     def _close(self):
         if self.db:
             self.db.close()
-        self.destroy()
+        self.master.quit()

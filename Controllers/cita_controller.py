@@ -1,7 +1,8 @@
+from tkinter import messagebox
 from Models.cita_Model import CitaModel
-# Importar vistas
 from Views.cita_view import CitaView
 from Views.formCitas_view import FormularioCita
+import tkinter as tk # Necesario para root.after
 
 class CitaController:
     """Controlador para el módulo de Programación de Citas."""
@@ -31,5 +32,40 @@ class CitaController:
         # Aquí puedes añadir validaciones de negocio antes de llamar al modelo
         return self.model.create_cita(paciente_id, doctor_id, fecha, hora, motivo)
         
-    # Nota: handle_modify_cita se dejará en el MainController para gestionar el flujo principal
-    # pero aquí se podría añadir una versión simple si es necesario.
+    def handle_modify_cita(self, cita_id, id_doctor, new_fecha, new_hora, new_motivo, new_estado, form_view):
+        """
+        Valida el horario, realiza la modificación de la cita 
+        y programa la recarga asíncrona de la agenda.
+        """
+        
+        # 1. Validación de conflicto
+        is_conflict = self.model.check_cita_conflict(
+            id_cita_to_exclude=cita_id, id_doctor=id_doctor, fecha=new_fecha, hora=new_hora
+        )
+        
+        if is_conflict:
+            messagebox.showerror("Error de Agenda", f"El Doctor ya tiene una cita agendada el día {new_fecha} a las {new_hora}.")
+            return
+
+        # 2. Modificación de la cita
+        success = self.model.update_cita(
+                cita_id=cita_id, id_doctor=id_doctor, fecha=new_fecha, hora=new_hora, 
+                motivo=new_motivo, estado=new_estado
+            )
+            
+        # 3. Manejo de Resultado y Sincronización
+        if success:
+            
+            # Definimos la función de acción segura
+            def safe_reload_and_close():
+                # self.view es la instancia de CitaView
+                self.view.date_var.set(new_fecha) 
+                self.view.load_agenda(new_fecha)
+                form_view.destroy() # Cierra el formulario DESPUÉS de la recarga
+                
+            # Programamos la ejecución asíncrona para que no interfiera con el cierre del modal
+            self.master_view.after(50, safe_reload_and_close) # 🚨 Usamos master_view (root) para el after
+            messagebox.showinfo("Éxito", "Cita modificada correctamente.")
+
+        else:
+            messagebox.showerror("Error", "No se pudo modificar la cita.")
