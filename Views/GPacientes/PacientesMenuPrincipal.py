@@ -35,6 +35,7 @@ def PacientesMenuPrincipal(root_principal=None):
     controller = PacienteController()
 
     if root_principal is None:
+        
         root = tk.Tk()
     else:
         root = tk.Toplevel(root_principal)
