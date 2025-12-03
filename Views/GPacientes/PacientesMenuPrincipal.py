@@ -34,9 +34,9 @@ class PacientesMenuPrincipalView(tk.Frame):
         self.config(bg=PALETA["bg"])
         self.pack(expand=True, fill="both")
 
-        self._create_widgets()
+        self.crear_widgets()
 
-    def _create_widgets(self):
+    def crear_widgets(self):
         # Estilos ttk (¡nombres únicos para este módulo!)
         style = ttk.Style(self)
         style.theme_use("clam")

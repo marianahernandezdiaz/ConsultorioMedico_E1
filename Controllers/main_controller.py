@@ -40,7 +40,7 @@ class MainController:
         if user_data:
             self.current_user = user_data
             self.login_view.destroy() 
-            print(f"✅ Login exitoso. Rol: {self.current_user['Nombre_Rol']}")
+            print(f"Login exitoso. Rol: {self.current_user['Nombre_Rol']}")
             self.show_main_menu(self.current_user['Nombre_Rol']) # Ir al menú RBAC
         else:
             self.login_view.show_error("Credenciales incorrectas o usuario no encontrado.")
@@ -101,7 +101,7 @@ class MainController:
         for widget in self.root.winfo_children():
             widget.destroy()
         self.PacientesMenuPrincipal = PacientesMenuPrincipal(self.root, self)
-        print("✅ Módulo de gestión de pacientes cargado.")
+        print("Módulo de gestión de pacientes cargado.")
 
 
     def open_citas_module(self):
@@ -109,7 +109,7 @@ class MainController:
         for widget in self.root.winfo_children():
             widget.destroy()
         self.cita_controller = CitaController(self.root, self)
-        print("✅ Módulo de Programación de Citas cargado.")
+        print("Módulo de Programación de Citas cargado.")
 
     def open_expediente_module(self):
         print("Abriendo Módulo de Expediente Clínico...")
@@ -117,7 +117,7 @@ class MainController:
             widget.destroy()
 
         self.doctor_controller = DoctorController(self.root, self.current_user, self)
-        print("✅ Módulo de expedientes médicos cargado.")
+        print("Módulo de expedientes médicos cargado.")
         
             
     def open_facturacion_menu(self):
@@ -125,21 +125,21 @@ class MainController:
         for widget in self.root.winfo_children():
             widget.destroy()
         self.facturacion_pagos_menu = MainMenuView_1(self.root, self)
-        print("✅ Submenú de Facturación/Pagos abierto.")
+        print("Submenú de Facturación/Pagos abierto.")
 
     def open_facturacion_module(self):
         print("Abriendo Facturación...")
         for widget in self.root.winfo_children():
             widget.destroy()
         self.facturacion_view = FacturacionView(self.root, self)
-        print("✅ Vista de Facturación cargada.")
+        print("Vista de Facturación cargada.")
 
     def open_pagos_module(self):
         print("Abriendo Pagos...")
         for widget in self.root.winfo_children():
             widget.destroy()
         self.pagos_view = PagosView(self.root, self)
-        print("✅ Vista de Pagos cargada.")
+        print("Vista de Pagos cargada.")
         
 
     def open_reportes_module(self):
@@ -148,7 +148,7 @@ class MainController:
             widget.destroy()
 
         self.reportes_view = ReportesView(self.root, self)
-        print("✅ Módulo de reportes cargado.")
+        print("Módulo de reportes cargado.")
 
 
     def handle_modify_cita(self, cita_id, id_doctor, new_fecha, new_hora, new_motivo, new_estado, form_view):
