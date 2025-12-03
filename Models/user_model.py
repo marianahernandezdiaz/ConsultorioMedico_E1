@@ -10,7 +10,12 @@ class UserModel:
         self.db = DBManager()
         cols = self.db.execute_query("SELECT column_name AS c FROM information_schema.columns WHERE table_schema=%s AND table_name='Usuarios'", (DB_CONFIG['database'],))
         names = {r['c'] for r in cols} if cols else set()
-        self.pass_col = 'Contrasena' if 'Contrasena' in names else 'Pasword'
+        if 'Password' in names:
+            self.pass_col = 'Password'
+        elif 'Pasword' in names:
+            self.pass_col = 'Pasword'
+        else:
+            self.pass_col = 'Contrasena'
 
     def get_user_by_credentials(self, email, password_hash):
         """

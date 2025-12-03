@@ -4,6 +4,8 @@ from Views.login_view import LoginView
 from Views.main_menu_view import MainMenuView
 from Views.facturacion_view import FacturacionView
 from Views.pagos_view import PagosView
+from Controllers.facturacion_controller import FacturacionController
+from Controllers.pagos_controller import PagosController
 
 ## esta clase manejara la autenticacion y las vistas a las que tiene acceso cada usuario
 class MainController:
@@ -75,10 +77,12 @@ class MainController:
             print("ACCESO DENEGADO a Reportes.")
 
     def open_facturacion_module(self):
-        FacturacionView(self.root)
+        controller = FacturacionController()
+        FacturacionView(self.root, controller)
 
     def open_pagos_module(self):
-        PagosView(self.root)
+        controller = PagosController()
+        PagosView(self.root, controller)
 
     def __del__(self):
         """Cierra la conexión a la DB al terminar la aplicación."""

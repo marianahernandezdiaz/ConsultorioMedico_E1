@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from datetime import date
 
-from Models.factura_model import FacturaModel
+from Controllers.facturacion_controller import FacturacionController
 
 PALETTE = {
     "primary": "#247D7F",
@@ -13,9 +13,9 @@ PALETTE = {
 }
 
 class FacturacionView(tk.Toplevel):
-    def __init__(self, master):
+    def __init__(self, master, controller=None):
         super().__init__(master)
-        self.model = FacturaModel()
+        self.controller = controller or FacturacionController()
         self.items = []
 
         self.title("Facturación")
@@ -129,33 +129,33 @@ class FacturacionView(tk.Toplevel):
             except Exception:
                 messagebox.showerror("Error", "ID Paciente inválido", parent=self)
                 return
-            if not self.model.paciente_exists(id_pac):
+            if not self.controller.paciente_exists(id_pac):
                 messagebox.showerror("Error", "Paciente no existe", parent=self)
                 return
         else:
-            id_pac = self.model.create_demo_paciente()
+            id_pac = self.controller.create_demo_paciente()
             if not id_pac:
                 messagebox.showerror("Error", "No se pudo crear paciente de prueba", parent=self)
                 return
         id_cita_txt = self.cita_entry.get().strip()
         id_cita = int(id_cita_txt) if id_cita_txt else None
-        if id_cita is not None and not self.model.cita_exists(id_cita):
+        if id_cita is not None and not self.controller.cita_exists(id_cita):
             messagebox.showerror("Error", "La Cita indicada no existe", parent=self)
             return
         fecha = self.fecha_entry.get().strip()
         total = float(self.total_var.get())
 
-        fid = self.model.create_factura(id_cita, id_pac, fecha, total, "Pendiente")
+        fid = self.controller.create_factura(id_cita, id_pac, fecha, total, "Pendiente")
         if not fid:
             messagebox.showerror("Error", "No se pudo crear la factura", parent=self)
             return
 
         for (nombre, c, p) in self.items:
-            sid = self.model.get_or_create_servicio(nombre, p)
+            sid = self.controller.get_or_create_servicio(nombre, p)
             if not sid:
                 messagebox.showerror("Error", "No se pudo registrar servicio", parent=self)
                 return
-            self.model.add_detalle(fid, sid, c, p)
+            self.controller.add_detalle(fid, sid, c, p)
 
         messagebox.showinfo("OK", f"Factura {fid} creada", parent=self)
         self.items.clear()
@@ -164,6 +164,6 @@ class FacturacionView(tk.Toplevel):
         self.update_total()
 
     def destroy(self):
-        self.model.close()
+        self.controller.close()
         self.grab_release()
         super().destroy()
