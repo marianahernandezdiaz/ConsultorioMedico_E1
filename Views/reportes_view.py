@@ -49,12 +49,11 @@ class ReportesView(tk.Toplevel):
     def _build_kpis(self):
         wrap = tk.Frame(self, bg=PALETTE["bg"]) 
         wrap.grid(row=2, column=0, sticky="ew", padx=16)
-        for i in range(4):
+        for i in range(3):
             wrap.columnconfigure(i, weight=1)
         self.kpi_total = self._kpi_card(wrap, 0, "Citas en rango", PALETTE["accent"]) 
         self.kpi_completadas = self._kpi_card(wrap, 1, "Completadas", PALETTE["primary"]) 
         self.kpi_productividad = self._kpi_card(wrap, 2, "% Productividad", PALETTE["muted"]) 
-        self.kpi_promedio = self._kpi_card(wrap, 3, "Promedio día", PALETTE["contrast"]) 
 
     def _kpi_card(self, parent, col, title, color):
         frame = tk.Frame(parent, bg=color)
@@ -136,12 +135,10 @@ class ReportesView(tk.Toplevel):
         total = tot_rows[0]["tot"] if tot_rows else 0
         completadas = comp_rows[0]["comp"] if comp_rows else 0
         productividad = round((completadas/total*100) if total else 0, 1)
-        promedio = round((sum(d["total"] for d in day_rows)/max(len(day_rows),1)), 2)
 
         self.kpi_total.config(text=str(total))
         self.kpi_completadas.config(text=str(completadas))
         self.kpi_productividad.config(text=f"{productividad}%")
-        self.kpi_promedio.config(text=str(promedio))
 
         for i in self.day_tv.get_children():
             self.day_tv.delete(i)
