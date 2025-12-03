@@ -1,4 +1,5 @@
 from .db_manager import DBManager
+from config import DB_CONFIG
 
 class FacturaModel:
     def __init__(self):
@@ -52,8 +53,13 @@ class FacturaModel:
         return bool(r)
 
     def create_demo_paciente(self):
+        name_col = "Nombres"
+        check = self.db.execute_query("SELECT 1 FROM information_schema.columns WHERE table_schema=%s AND table_name='Pacientes' AND column_name='Nombres'", (DB_CONFIG['database'],))
+        if not check:
+            name_col = "Nombre(s)"
+        q = f"INSERT INTO Pacientes (`{name_col}`, `Apellidos`, `Fecha_nac`, `Telefono`, `Direccion`, `Seguro_Med`) VALUES (%s,%s,%s,%s,%s,%s)"
         ok = self.db.execute_commit(
-            "INSERT INTO Pacientes (Nombres, Apellidos, Fecha_nac, Telefono, Direccion, Seguro_Med) VALUES (%s,%s,%s,%s,%s,%s)",
+            q,
             ("Paciente", "Demo", "1990-01-01", None, None, None),
         )
         if not ok:
