@@ -11,20 +11,23 @@ class CitaModel:
         query = "SELECT ID_Usuario, Nombre_usuario FROM Usuarios WHERE ID_Rol = 3"
         return self.db.execute_query(query)
 
-    def search_paciente(self, search_term):
-        """Busca un paciente por nombre o apellido para el formulario."""
-        term = f'%{search_term}%'
-        
-        # Usamos alias para garantizar que las claves sean 'Nombres' y 'Apellidos'
-        query = """
-        SELECT ID_Paciente, 
-               Nombres AS Nombres, 
-               Apellidos AS Apellidos, 
-               Telefono 
-        FROM pacientes 
-        WHERE Nombres LIKE %s OR Apellidos LIKE %s LIMIT 10
+    def obtener_paciente_por_id(self, id_paciente: int):
         """
-        return self.db.execute_query(query, (term, term)) 
+        Devuelve un paciente como diccionario (o None si no existe)
+        """
+        sql = """
+            SELECT ID_Paciente, Nombres, Apellidos, Fecha_nac,
+                Telefono, Direccion, Seguro_Med
+            FROM Pacientes
+            WHERE ID_Paciente = %s
+        """
+        params = (id_paciente,)
+
+        resultados = self.db.execute_query(sql, params)
+        if resultados:
+            return resultados[0]
+        return None
+
 
     def get_citas_by_day(self, date):
         """Retorna todas las citas para un día específico."""

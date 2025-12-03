@@ -25,8 +25,14 @@ class CitaController:
     def get_doctors_list(self):
         return self.model.get_all_doctors()
         
-    def search_pacientes(self, term):
-        return self.model.search_paciente(term)
+    def search_paciente_by_id(self, term):
+        # term viene como string, aquí lo convertimos a ID
+        try:
+            id_paciente = int(term)
+        except ValueError:
+            return None
+        return self.model.obtener_paciente_por_id(id_paciente)
+
 
     def agendar_cita(self, paciente_id, doctor_id, fecha, hora, motivo):
         # Aquí puedes añadir validaciones de negocio antes de llamar al modelo
