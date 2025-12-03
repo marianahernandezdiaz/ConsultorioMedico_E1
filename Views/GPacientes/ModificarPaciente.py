@@ -1,15 +1,10 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
+import sys, os
 
-# Misma paleta que las demás vistas
-PALETA = {
-    "header": "#247D7F",
-    "fondo": "#B2D9C4",
-    "frame": "#80B9C8",
-    "btn_principal": "#247D7F",
-    "btn_secundario": "#44916F",
-    "accent": "#C29470"
-}
+# Usar el mismo tema global que el resto del sistema
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+from tema_config import THEME
 
 
 def abrir_ventana_modificar_paciente(master, controller):
@@ -19,58 +14,89 @@ def abrir_ventana_modificar_paciente(master, controller):
 
     win = tk.Toplevel(master)
     win.title("Modificar Paciente")
-    win.geometry("650x500")
-    win.config(bg=PALETA["fondo"])
+    win.geometry("700x520")
+    win.config(bg=THEME["bg"])
     win.grab_set()
 
     # ---------- Estilos ----------
     style = ttk.Style(win)
     style.theme_use("clam")
 
+    # Botones
     style.configure(
         "Primary.TButton",
-        background=PALETA["btn_principal"],
+        background=THEME["success"],
         foreground="white",
-        padding=6
+        padding=6,
+        font=("Segoe UI", 10, "bold")
     )
-    style.map("Primary.TButton", background=[("active", PALETA["accent"])])
+    style.map(
+        "Primary.TButton",
+        background=[("active", THEME["accent"])]
+    )
 
     style.configure(
         "Secondary.TButton",
-        background=PALETA["btn_secundario"],
+        background=THEME["secondary"],
         foreground="white",
-        padding=6
+        padding=6,
+        font=("Segoe UI", 10, "bold")
     )
-    style.map("Secondary.TButton", background=[("active", PALETA["header"])])
+    style.map(
+        "Secondary.TButton",
+        background=[("active", THEME["primary"])]
+    )
+
+    # Entradas
+    style.configure(
+        "TEntry",
+        fieldbackground=THEME["white"],
+        foreground=THEME["text"],
+        borderwidth=1
+    )
 
     # ---------- Header ----------
-    header = tk.Frame(win, bg=PALETA["header"])
+    header = tk.Frame(win, bg=THEME["primary"])
     header.pack(fill="x")
 
     tk.Label(
         header,
         text="Modificar datos de paciente",
-        bg=PALETA["header"],
+        bg=THEME["primary"],
         fg="white",
-        font=("Arial", 18, "bold")
+        font=("Segoe UI", 18, "bold")
     ).pack(pady=10)
 
+    # ---------- Contenedor principal ----------
+    contenedor = tk.Frame(win, bg=THEME["bg"])
+    contenedor.pack(fill="both", expand=True, padx=20, pady=(15, 10))
+
     # ---------- Formulario ----------
-    frame_form = tk.Frame(win, bg=PALETA["frame"], padx=15, pady=15)
-    frame_form.pack(fill="both", expand=True, padx=20, pady=(15, 5))
+    frame_form = tk.Frame(
+        contenedor,
+        bg=THEME["white"],
+        padx=20,
+        pady=20,
+        bd=1,
+        relief=tk.SOLID
+    )
+    frame_form.pack(fill="both", expand=True)
 
     frame_form.columnconfigure(0, weight=0)
     frame_form.columnconfigure(1, weight=1)
+    frame_form.columnconfigure(2, weight=0)
 
     # --- Fila 0: Buscar por ID ---
     tk.Label(
         frame_form,
         text="ID Paciente:",
-        bg=PALETA["frame"],
-        anchor="w"
+        bg=THEME["white"],
+        fg=THEME["text"],
+        anchor="w",
+        font=("Segoe UI", 10, "bold")
     ).grid(row=0, column=0, sticky="w", pady=5, padx=5)
 
-    entry_id = tk.Entry(frame_form, width=10)
+    entry_id = ttk.Entry(frame_form, width=10)
     entry_id.grid(row=0, column=1, sticky="w", pady=5, padx=5)
 
     def cargar_paciente():
@@ -109,19 +135,21 @@ def abrir_ventana_modificar_paciente(master, controller):
         text="Cargar",
         style="Secondary.TButton",
         command=cargar_paciente
-    ).grid(row=0, column=2, padx=10, pady=5)
+    ).grid(row=0, column=2, padx=10, pady=5, sticky="e")
 
     # Helper para entradas
-    def add_labeled_entry(label, row, width=30):
+    def add_labeled_entry(label, row, width=35):
         tk.Label(
             frame_form,
             text=label,
-            bg=PALETA["frame"],
-            anchor="w"
+            bg=THEME["white"],
+            fg=THEME["text"],
+            anchor="w",
+            font=("Segoe UI", 10, "bold")
         ).grid(row=row, column=0, sticky="w", pady=5, padx=5)
 
-        e = tk.Entry(frame_form, width=width)
-        e.grid(row=row, column=1, columnspan=2, sticky="w", pady=5, padx=5)
+        e = ttk.Entry(frame_form, width=width)
+        e.grid(row=row, column=1, columnspan=2, sticky="ew", pady=5, padx=5)
         return e
 
     # Campos editables (igual que la tabla Pacientes)
@@ -131,10 +159,13 @@ def abrir_ventana_modificar_paciente(master, controller):
     tk.Label(
         frame_form,
         text="Fecha de nacimiento (YYYY-MM-DD):",
-        bg=PALETA["frame"],
-        anchor="w"
+        bg=THEME["white"],
+        fg=THEME["text"],
+        anchor="w",
+        font=("Segoe UI", 10, "bold")
     ).grid(row=3, column=0, sticky="w", pady=5, padx=5)
-    entry_fecha_nac = tk.Entry(frame_form, width=20)
+
+    entry_fecha_nac = ttk.Entry(frame_form, width=20)
     entry_fecha_nac.grid(row=3, column=1, sticky="w", pady=5, padx=5)
 
     entry_telefono = add_labeled_entry("Teléfono:", 4)
@@ -183,19 +214,23 @@ def abrir_ventana_modificar_paciente(master, controller):
             messagebox.showerror("Error", f"Ocurrió un error al actualizar:\n{e}")
 
     # ---------- Botones inferior ----------
-    frame_botones = tk.Frame(win, bg=PALETA["fondo"])
-    frame_botones.pack(side="bottom", pady=10)
+    frame_botones = tk.Frame(contenedor, bg=THEME["bg"])
+    frame_botones.pack(fill="x", pady=10)
+
+    frame_botones.columnconfigure(0, weight=1)
+    frame_botones.columnconfigure(1, weight=0)
+    frame_botones.columnconfigure(2, weight=0)
 
     ttk.Button(
         frame_botones,
         text="Guardar cambios",
         style="Primary.TButton",
         command=guardar_cambios
-    ).grid(row=0, column=0, padx=10, pady=5)
+    ).grid(row=0, column=1, padx=10, pady=5, sticky="e")
 
     ttk.Button(
         frame_botones,
         text="Cancelar",
         style="Secondary.TButton",
         command=win.destroy
-    ).grid(row=0, column=1, padx=10, pady=5)
+    ).grid(row=0, column=2, padx=10, pady=5, sticky="e")

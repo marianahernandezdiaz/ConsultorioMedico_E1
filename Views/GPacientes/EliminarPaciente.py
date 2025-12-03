@@ -1,15 +1,10 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
+import sys, os
 
-# Misma paleta que las demás vistas
-PALETA = {
-    "header": "#247D7F",
-    "fondo": "#B2D9C4",
-    "frame": "#80B9C8",
-    "btn_principal": "#247D7F",
-    "btn_secundario": "#44916F",
-    "accent": "#C29470"
-}
+# Para usar el mismo tema que DoctorView
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+from tema_config import THEME
 
 
 def abrir_ventana_eliminar_paciente(master, controller):
@@ -19,8 +14,8 @@ def abrir_ventana_eliminar_paciente(master, controller):
 
     win = tk.Toplevel(master)
     win.title("Eliminar Paciente")
-    win.geometry("600x350")
-    win.config(bg=PALETA["fondo"])
+    win.geometry("650x400")
+    win.config(bg=THEME["bg"])
     win.grab_set()
 
     # ---------- Estilos ----------
@@ -29,62 +24,110 @@ def abrir_ventana_eliminar_paciente(master, controller):
 
     style.configure(
         "Primary.TButton",
-        background=PALETA["btn_principal"],
+        background=THEME["danger"],
         foreground="white",
-        padding=6
+        padding=6,
+        font=("Segoe UI", 10, "bold")
     )
-    style.map("Primary.TButton", background=[("active", PALETA["accent"])])
+    style.map(
+        "Primary.TButton",
+        background=[("active", THEME["accent"])]
+    )
 
     style.configure(
         "Secondary.TButton",
-        background=PALETA["btn_secundario"],
+        background=THEME["secondary"],
         foreground="white",
-        padding=6
+        padding=6,
+        font=("Segoe UI", 10, "bold")
     )
-    style.map("Secondary.TButton", background=[("active", PALETA["header"])])
+    style.map(
+        "Secondary.TButton",
+        background=[("active", THEME["primary"])]
+    )
+
+    style.configure(
+        "TEntry",
+        fieldbackground=THEME["white"],
+        foreground=THEME["text"],
+        borderwidth=1
+    )
 
     # ---------- Header ----------
-    header = tk.Frame(win, bg=PALETA["header"])
+    header = tk.Frame(win, bg=THEME["primary"])
     header.pack(fill="x")
 
     tk.Label(
         header,
         text="Eliminar paciente",
-        bg=PALETA["header"],
+        bg=THEME["primary"],
         fg="white",
-        font=("Arial", 18, "bold")
+        font=("Segoe UI", 18, "bold")
     ).pack(pady=10)
 
     # ---------- Contenido ----------
-    frame_main = tk.Frame(win, bg=PALETA["frame"], padx=15, pady=15)
-    frame_main.pack(fill="both", expand=True, padx=20, pady=(15, 5))
+    contenedor = tk.Frame(win, bg=THEME["bg"])
+    contenedor.pack(fill="both", expand=True, padx=20, pady=(15, 10))
+
+    frame_main = tk.Frame(
+        contenedor,
+        bg=THEME["white"],
+        padx=15,
+        pady=15,
+        bd=1,
+        relief=tk.SOLID
+    )
+    frame_main.pack(fill="both", expand=True)
 
     frame_main.columnconfigure(0, weight=0)
     frame_main.columnconfigure(1, weight=1)
+    frame_main.columnconfigure(2, weight=0)
 
     # --- Buscar por ID ---
     tk.Label(
         frame_main,
         text="ID Paciente:",
-        bg=PALETA["frame"],
-        anchor="w"
+        bg=THEME["white"],
+        fg=THEME["text"],
+        anchor="w",
+        font=("Segoe UI", 10, "bold")
     ).grid(row=0, column=0, sticky="w", pady=5, padx=5)
 
-    entry_id = tk.Entry(frame_main, width=10)
+    entry_id = ttk.Entry(frame_main, width=10)
     entry_id.grid(row=0, column=1, sticky="w", pady=5, padx=5)
+
+    ttk.Button(
+        frame_main,
+        text="Buscar",
+        style="Secondary.TButton",
+        command=lambda: cargar_paciente()
+    ).grid(row=0, column=2, padx=10, pady=5, sticky="e")
 
     # Área para mostrar información del paciente
     info_label = tk.Label(
         frame_main,
         text="Datos del paciente:",
-        bg=PALETA["frame"],
+        bg=THEME["white"],
+        fg=THEME["text"],
         anchor="w",
-        font=("Arial", 10, "bold")
+        font=("Segoe UI", 10, "bold")
     )
-    info_label.grid(row=1, column=0, columnspan=2, sticky="w", pady=(15, 5), padx=5)
+    info_label.grid(row=1, column=0, columnspan=3, sticky="w", pady=(15, 5), padx=5)
 
-    text_info = tk.Text(frame_main, width=50, height=6, state="disabled")
-    text_info.grid(row=2, column=0, columnspan=3, pady=5, padx=5)
+    text_info = tk.Text(
+        frame_main,
+        width=60,
+        height=7,
+        state="disabled",
+        bg=THEME["white"],
+        fg=THEME["text"],
+        relief=tk.SOLID,
+        bd=1,
+        font=("Segoe UI", 10)
+    )
+    text_info.grid(row=2, column=0, columnspan=3, pady=5, padx=5, sticky="nsew")
+
+    frame_main.rowconfigure(2, weight=1)
 
     def mostrar_info(texto):
         text_info.config(state="normal")
@@ -119,16 +162,13 @@ def abrir_ventana_eliminar_paciente(master, controller):
         )
         mostrar_info(resumen)
 
-    ttk.Button(
-        frame_main,
-        text="Buscar",
-        style="Secondary.TButton",
-        command=cargar_paciente
-    ).grid(row=0, column=2, padx=10, pady=5)
-
     # ---------- Botones inferior ----------
-    frame_botones = tk.Frame(win, bg=PALETA["fondo"])
-    frame_botones.pack(side="bottom", pady=10)
+    frame_botones = tk.Frame(contenedor, bg=THEME["bg"])
+    frame_botones.pack(fill="x", pady=10)
+
+    frame_botones.columnconfigure(0, weight=1)
+    frame_botones.columnconfigure(1, weight=0)
+    frame_botones.columnconfigure(2, weight=0)
 
     def eliminar_paciente():
         id_txt = entry_id.get().strip()
@@ -163,11 +203,11 @@ def abrir_ventana_eliminar_paciente(master, controller):
         text="Eliminar",
         style="Primary.TButton",
         command=eliminar_paciente
-    ).grid(row=0, column=0, padx=10, pady=5)
+    ).grid(row=0, column=1, padx=10, pady=5, sticky="e")
 
     ttk.Button(
         frame_botones,
         text="Cancelar",
         style="Secondary.TButton",
         command=win.destroy
-    ).grid(row=0, column=1, padx=10, pady=5)
+    ).grid(row=0, column=2, padx=10, pady=5, sticky="e")

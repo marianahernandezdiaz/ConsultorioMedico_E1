@@ -1,14 +1,10 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
+import sys, os
 
-PALETA = {
-    "header": "#247D7F",
-    "fondo": "#B2D9C4",
-    "frame": "#80B9C8",
-    "btn_principal": "#247D7F",
-    "btn_secundario": "#44916F",
-    "accent": "#C29470"
-}
+# Usar el mismo tema global
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+from tema_config import THEME
 
 
 def abrir_ventana_buscar_paciente(master, controller):
@@ -18,8 +14,8 @@ def abrir_ventana_buscar_paciente(master, controller):
 
     win = tk.Toplevel(master)
     win.title("Buscar Paciente")
-    win.geometry("650x400")
-    win.config(bg=PALETA["fondo"])
+    win.geometry("650x450")
+    win.config(bg=THEME["bg"])
     win.grab_set()
 
     # ---------- Estilos ----------
@@ -28,49 +24,67 @@ def abrir_ventana_buscar_paciente(master, controller):
 
     style.configure(
         "Primary.TButton",
-        background=PALETA["btn_principal"],
+        background=THEME["primary"],
         foreground="white",
-        padding=6
+        padding=6,
+        font=("Segoe UI", 10, "bold")
     )
-    style.map("Primary.TButton", background=[("active", PALETA["accent"])])
+    style.map(
+        "Primary.TButton",
+        background=[("active", THEME["accent"])]
+    )
 
     style.configure(
         "Secondary.TButton",
-        background=PALETA["btn_secundario"],
+        background=THEME["secondary"],
         foreground="white",
-        padding=6
+        padding=6,
+        font=("Segoe UI", 10, "bold")
     )
-    style.map("Secondary.TButton", background=[("active", PALETA["header"])])
+    style.map(
+        "Secondary.TButton",
+        background=[("active", THEME["primary"])]
+    )
 
     # ---------- Header ----------
-    header = tk.Frame(win, bg=PALETA["header"])
+    header = tk.Frame(win, bg=THEME["primary"])
     header.pack(fill="x")
 
     tk.Label(
         header,
         text="Buscar paciente por ID",
-        bg=PALETA["header"],
+        bg=THEME["primary"],
         fg="white",
-        font=("Arial", 18, "bold")
+        font=("Segoe UI", 18, "bold")
     ).pack(pady=10)
 
+    # ---------- Contenedor principal ----------
+    contenedor = tk.Frame(win, bg=THEME["bg"])
+    contenedor.pack(fill="both", expand=True, padx=20, pady=(10, 10))
+
     # ---------- Zona de búsqueda ----------
-    frame_search = tk.Frame(win, bg=PALETA["frame"], padx=15, pady=10)
-    frame_search.pack(fill="x", padx=20, pady=(10, 5))
+    frame_search = tk.Frame(contenedor, bg=THEME["white"], padx=15, pady=10, bd=1, relief=tk.SOLID)
+    frame_search.pack(fill="x")
+
+    frame_search.columnconfigure(0, weight=0)
+    frame_search.columnconfigure(1, weight=1)
+    frame_search.columnconfigure(2, weight=0)
 
     tk.Label(
         frame_search,
         text="ID Paciente:",
-        bg=PALETA["frame"],
-        anchor="w"
+        bg=THEME["white"],
+        fg=THEME["text"],
+        anchor="w",
+        font=("Segoe UI", 10, "bold")
     ).grid(row=0, column=0, sticky="w", pady=5, padx=5)
 
-    entry_id = tk.Entry(frame_search, width=10)
+    entry_id = ttk.Entry(frame_search, width=10)
     entry_id.grid(row=0, column=1, sticky="w", pady=5, padx=5)
 
     # ---------- Zona de datos (solo lectura) ----------
-    frame_datos = tk.Frame(win, bg=PALETA["frame"], padx=15, pady=15)
-    frame_datos.pack(fill="both", expand=True, padx=20, pady=(5, 10))
+    frame_datos = tk.Frame(contenedor, bg=THEME["white"], padx=15, pady=15, bd=1, relief=tk.SOLID)
+    frame_datos.pack(fill="both", expand=True, pady=(10, 0))
 
     frame_datos.columnconfigure(0, weight=0)
     frame_datos.columnconfigure(1, weight=1)
@@ -79,16 +93,19 @@ def abrir_ventana_buscar_paciente(master, controller):
         tk.Label(
             frame_datos,
             text=label_text,
-            bg=PALETA["frame"],
+            bg=THEME["white"],
+            fg=THEME["text"],
             anchor="w",
-            font=("Arial", 10, "bold")
+            font=("Segoe UI", 10, "bold")
         ).grid(row=row, column=0, sticky="w", pady=3, padx=5)
 
         lbl_val = tk.Label(
             frame_datos,
             text="-",
-            bg=PALETA["frame"],
-            anchor="w"
+            bg=THEME["white"],
+            fg=THEME["text"],
+            anchor="w",
+            font=("Segoe UI", 10)
         )
         lbl_val.grid(row=row, column=1, sticky="w", pady=3, padx=5)
         return lbl_val
@@ -143,15 +160,18 @@ def abrir_ventana_buscar_paciente(master, controller):
         text="Buscar",
         style="Secondary.TButton",
         command=buscar_paciente
-    ).grid(row=0, column=2, padx=10, pady=5)
+    ).grid(row=0, column=2, padx=10, pady=5, sticky="e")
 
     # ---------- Botón cerrar ----------
-    frame_botones = tk.Frame(win, bg=PALETA["fondo"])
-    frame_botones.pack(side="bottom", pady=10)
+    frame_botones = tk.Frame(contenedor, bg=THEME["bg"])
+    frame_botones.pack(fill="x", pady=10)
+
+    frame_botones.columnconfigure(0, weight=1)
+    frame_botones.columnconfigure(1, weight=0)
 
     ttk.Button(
         frame_botones,
         text="Cerrar",
         style="Primary.TButton",
         command=win.destroy
-    ).grid(row=0, column=0, padx=10, pady=5)
+    ).grid(row=0, column=1, padx=10, pady=5, sticky="e")

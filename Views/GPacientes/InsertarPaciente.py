@@ -1,49 +1,56 @@
 import tkinter as tk 
 from tkinter import ttk, messagebox
+import sys, os
 
-# Paleta de colores
-PALETA = {
-    "header": "#247D7F",       # Barra superior / títulos
-    "fondo": "#B2D9C4",        # Fondo de la ventana
-    "frame": "#80B9C8",        # Fondo del formulario
-    "btn_principal": "#247D7F",
-    "btn_secundario": "#44916F",
-    "accent": "#C29470"
-}
+# Para poder importar tema_config igual que en DoctorView
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+from tema_config import THEME
 
 
 def abrir_ventana_insertar_paciente(master, controller):
 
     win = tk.Toplevel(master)
     win.title("Insertar Paciente")
-    win.geometry("650x450")
-    win.config(bg=PALETA["fondo"])
+    win.geometry("700x480")
+    win.config(bg=THEME["bg"])
     win.grab_set()  # para que tenga el foco hasta cerrar
 
-    # --------- Estilos ttk para botones ----------
+    # --------- Estilos ttk para botones y entries ----------
     estilo = ttk.Style(win)
     estilo.theme_use("clam")
 
+    # Botón principal (Guardar)
     estilo.configure(
         "Primary.TButton",
-        background=PALETA["btn_principal"],
+        background=THEME["success"],
         foreground="white",
-        padding=6
+        padding=6,
+        font=("Segoe UI", 10, "bold")
     )
     estilo.map(
         "Primary.TButton",
-        background=[("active", PALETA["accent"])]
+        background=[("active", THEME["accent"])]
     )
 
+    # Botón secundario (Cancelar)
     estilo.configure(
         "Secondary.TButton",
-        background=PALETA["btn_secundario"],
+        background=THEME["secondary"],
         foreground="white",
-        padding=6
+        padding=6,
+        font=("Segoe UI", 10, "bold")
     )
     estilo.map(
         "Secondary.TButton",
-        background=[("active", PALETA["header"])]
+        background=[("active", THEME["primary"])]
+    )
+
+    # Estilo para Entry (para que combine con el tema)
+    estilo.configure(
+        "TEntry",
+        fieldbackground=THEME["white"],
+        foreground=THEME["text"],
+        borderwidth=1
     )
 
     # --------- Helper para crear filas de etiqueta + entry ----------
@@ -51,30 +58,35 @@ def abrir_ventana_insertar_paciente(master, controller):
         tk.Label(
             parent,
             text=texto_etiqueta,
-            bg=PALETA["frame"],
+            bg=THEME["white"],
+            fg=THEME["text"],
             anchor="w",
-            font=("Arial", 10, "bold")  # Etiquetas en negrita
+            font=("Segoe UI", 10, "bold")
         ).grid(row=fila, column=0, sticky="w", pady=5, padx=5)
 
-        entrada = tk.Entry(parent, width=ancho)
-        entrada.grid(row=fila, column=1, sticky="w", pady=5, padx=5)
+        entrada = ttk.Entry(parent, width=ancho)
+        entrada.grid(row=fila, column=1, sticky="ew", pady=5, padx=5)
         return entrada
 
     # --------- Header ----------
-    header = tk.Frame(win, bg=PALETA["header"])
+    header = tk.Frame(win, bg=THEME["primary"])
     header.pack(fill="x")
 
     tk.Label(
         header,
         text="Registro de nuevo paciente",
-        bg=PALETA["header"],
+        bg=THEME["primary"],
         fg="white",
-        font=("Arial", 18, "bold")
-    ).pack(pady=10)
+        font=("Segoe UI", 18, "bold")
+    ).pack(pady=12)
+
+    # --------- Contenedor principal ----------
+    contenedor = tk.Frame(win, bg=THEME["bg"])
+    contenedor.pack(fill="both", expand=True, padx=20, pady=(15, 10))
 
     # --------- Formulario ----------
-    frame_form = tk.Frame(win, bg=PALETA["frame"], padx=15, pady=15, bd=0)
-    frame_form.pack(fill="both", expand=True, padx=20, pady=(15, 5))
+    frame_form = tk.Frame(contenedor, bg=THEME["white"], padx=20, pady=20, bd=1, relief=tk.SOLID)
+    frame_form.pack(fill="both", expand=True)
 
     frame_form.columnconfigure(0, weight=0)
     frame_form.columnconfigure(1, weight=1)
@@ -87,17 +99,30 @@ def abrir_ventana_insertar_paciente(master, controller):
     tk.Label(
         frame_form,
         text="Fecha de nacimiento (YYYY-MM-DD):",
-        bg=PALETA["frame"],
+        bg=THEME["white"],
+        fg=THEME["text"],
         anchor="w",
-        font=("Arial", 10, "bold")  # Etiqueta en negrita
+        font=("Segoe UI", 10, "bold")
     ).grid(row=2, column=0, sticky="w", pady=5, padx=5)
 
-    entrada_fecha_nac = tk.Entry(frame_form, width=20)
+    entrada_fecha_nac = ttk.Entry(frame_form, width=20)
     entrada_fecha_nac.grid(row=2, column=1, sticky="w", pady=5, padx=5)
 
-    # Ajustamos el tamaño de los campos de entrada para que todos sean del mismo tamaño
     entrada_telefono = agregar_entrada_con_etiqueta(frame_form, "Teléfono:", 3)
-    entrada_direccion = agregar_entrada_con_etiqueta(frame_form, "Dirección:", 4, ancho=40)
+
+    # Dirección ocupa más ancho
+    tk.Label(
+        frame_form,
+        text="Dirección:",
+        bg=THEME["white"],
+        fg=THEME["text"],
+        anchor="w",
+        font=("Segoe UI", 10, "bold")
+    ).grid(row=4, column=0, sticky="nw", pady=5, padx=5)
+
+    entrada_direccion = ttk.Entry(frame_form)
+    entrada_direccion.grid(row=4, column=1, sticky="ew", pady=5, padx=5)
+
     entrada_seguro = agregar_entrada_con_etiqueta(frame_form, "Seguro médico:", 5)
 
     # --------- Guardar ----------
@@ -130,19 +155,23 @@ def abrir_ventana_insertar_paciente(master, controller):
             messagebox.showerror("Error", f"Ocurrió un error al guardar:\n{e}")
 
     # --------- Botones ---------
-    frame_botones = tk.Frame(win, bg=PALETA["fondo"])
-    frame_botones.pack(side="bottom", pady=10)
+    frame_botones = tk.Frame(contenedor, bg=THEME["bg"])
+    frame_botones.pack(fill="x", pady=(10, 5))
+
+    frame_botones.columnconfigure(0, weight=1)
+    frame_botones.columnconfigure(1, weight=0)
+    frame_botones.columnconfigure(2, weight=0)
 
     ttk.Button(
         frame_botones,
         text="Guardar",
         style="Primary.TButton",
         command=guardar_paciente
-    ).grid(row=0, column=0, padx=10, pady=5)
+    ).grid(row=0, column=1, padx=10, pady=5, sticky="e")
 
     ttk.Button(
         frame_botones,
         text="Cancelar",
         style="Secondary.TButton",
         command=win.destroy
-    ).grid(row=0, column=1, padx=10, pady=5)
+    ).grid(row=0, column=2, padx=10, pady=5, sticky="e")

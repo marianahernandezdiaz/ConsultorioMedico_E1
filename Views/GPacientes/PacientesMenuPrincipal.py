@@ -37,28 +37,36 @@ class PacientesMenuPrincipalView(tk.Frame):
         self._create_widgets()
 
     def _create_widgets(self):
-        # Estilos ttk
+        # Estilos ttk (¡nombres únicos para este módulo!)
         style = ttk.Style(self)
         style.theme_use("clam")
 
-        style.configure("Primary.TButton",
-                       background=PALETA["white"],
-                       foreground=PALETA["text"],
-                       padding=15,
-                       font=("Segoe UI", 11),
-                       borderwidth=1,
-                       relief="flat")
-        style.map("Primary.TButton",
-                    background=[("active", PALETA["secondary"])],
-                    foreground=[("active", "white")])
+        style.configure(
+            "PacientesPrimary.TButton",
+            background=PALETA["white"],
+            foreground=PALETA["text"],
+            padding=15,
+            font=("Segoe UI", 11),
+            borderwidth=1,
+            relief="flat"
+        )
+        style.map(
+            "PacientesPrimary.TButton",
+            background=[("active", PALETA["secondary"])],
+            foreground=[("active", "white")]
+        )
 
-        style.configure("Secondary.TButton",
-                        background=PALETA["accent"],
-                        foreground="white",
-                        padding=10,
-                        font=("Segoe UI", 10))
-        style.map("Secondary.TButton",
-                    background=[("active", PALETA["secondary"])])
+        style.configure(
+            "PacientesSecondary.TButton",
+            background=PALETA["accent"],
+            foreground="white",
+            padding=10,
+            font=("Segoe UI", 10)
+        )
+        style.map(
+            "PacientesSecondary.TButton",
+            background=[("active", PALETA["secondary"])]
+        )
 
         # Encabezado
         header = tk.Frame(self, bg=PALETA["primary"])
@@ -92,35 +100,35 @@ class PacientesMenuPrincipalView(tk.Frame):
         ttk.Button(
             frame_botones,
             text="Insertar",
-            style="Primary.TButton",
+            style="PacientesPrimary.TButton",
             command=lambda: abrir_ventana_insertar_paciente(self.root_principal, self.controller)
         ).grid(row=0, column=0, padx=10, pady=10, sticky="ew")
 
         ttk.Button(
             frame_botones,
             text="Buscar",
-            style="Primary.TButton",
+            style="PacientesPrimary.TButton",
             command=lambda: abrir_ventana_buscar_paciente(self.root_principal, self.controller)
         ).grid(row=0, column=1, padx=10, pady=10, sticky="ew")
 
         ttk.Button(
             frame_botones,
             text="Modificar",
-            style="Primary.TButton",
+            style="PacientesPrimary.TButton",
             command=lambda: abrir_ventana_modificar_paciente(self.root_principal, self.controller)
         ).grid(row=1, column=0, padx=10, pady=10, sticky="ew")
 
         ttk.Button(
             frame_botones,
             text="Eliminar",
-            style="Primary.TButton",
+            style="PacientesPrimary.TButton",
             command=lambda: abrir_ventana_eliminar_paciente(self.root_principal, self.controller)
         ).grid(row=1, column=1, padx=10, pady=10, sticky="ew")
 
         ttk.Button(
             frame_botones,
             text="Listar",
-            style="Primary.TButton",
+            style="PacientesPrimary.TButton",
             command=lambda: abrir_ventana_listar_pacientes(self.root_principal, self.controller)
         ).grid(row=2, column=0, columnspan=2, padx=10, pady=(15, 5), sticky="ew")
 
@@ -135,7 +143,7 @@ class PacientesMenuPrincipalView(tk.Frame):
             ttk.Button(
                 frame_volver,
                 text="← Volver al Menú Principal",
-                style="Secondary.TButton",
+                style="PacientesSecondary.TButton",
                 command=self.main_controller.go_back_to_main_menu,
                 cursor="hand2"
             ).pack()
@@ -157,5 +165,3 @@ def PacientesMenuPrincipal(root_principal=None, main_controller=None):
 
 if __name__ == "__main__":
     PacientesMenuPrincipal()
-
-

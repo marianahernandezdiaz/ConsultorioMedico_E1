@@ -1,7 +1,4 @@
-"""
-Configuración de tema minimalista para el Sistema Médico
-Paleta de colores profesional y suave
-"""
+# Colores y deficnicion de tamaños y tipos de letra
 
 # Paleta de colores minimalista
 THEME = {
@@ -24,14 +21,18 @@ THEME = {
     "divider": "#D5DBDB",      # Líneas divisorias
 
     # Estados
-    "success": "#27AE60",      # Verde suave (éxito)
+    "success": "#27AE60",      # Verde suave (exito)
     "warning": "#F39C12",      # Naranja suave (advertencia)
-    "danger": "#E74C3C",       # Rojo suave (error)
+    "danger": "#E74C3C",       # Rojo suave (error o cerrar ventanass )
     "info": "#3498DB",         # Azul suave (información)
 
     # Hover y activos
     "hover": "#34495E",        # Color al pasar el mouse
     "active": "#2C3E50",       # Color cuando está activo
+
+    "muted": "#D3D3D3",
+    "contrast": "#000000"
+
 }
 
 # Fuentes

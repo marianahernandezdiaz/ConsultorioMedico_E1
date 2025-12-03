@@ -1,14 +1,10 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
+import sys, os
 
-PALETA = {
-    "header": "#247D7F",  # Green color for the header
-    "fondo": "#B2D9C4",
-    "frame": "#80B9C8",
-    "btn_principal": "#247D7F",
-    "btn_secundario": "#44916F",
-    "accent": "#C29470"
-}
+# Mismo tema global que el resto de vistas
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+from tema_config import THEME
 
 
 def abrir_ventana_listar_pacientes(master, controller):
@@ -18,60 +14,88 @@ def abrir_ventana_listar_pacientes(master, controller):
 
     win = tk.Toplevel(master)
     win.title("Lista de Pacientes")
-    win.geometry("800x500")
-    win.config(bg=PALETA["fondo"])
+    win.geometry("900x565")
+    win.config(bg=THEME["bg"])
     win.grab_set()
 
     # ---------- Estilos ----------
     style = ttk.Style(win)
     style.theme_use("clam")
 
+    # Botones
     style.configure(
         "Primary.TButton",
-        background=PALETA["btn_principal"],
+        background=THEME["primary"],
         foreground="white",
-        padding=6
+        padding=6,
+        font=("Segoe UI", 10, "bold")
     )
-    style.map("Primary.TButton", background=[("active", PALETA["accent"])])
+    style.map(
+        "Primary.TButton",
+        background=[("active", THEME["accent"])]
+    )
 
     style.configure(
         "Secondary.TButton",
-        background=PALETA["btn_secundario"],
+        background=THEME["secondary"],
         foreground="white",
-        padding=6
+        padding=6,
+        font=("Segoe UI", 10, "bold")
     )
-    style.map("Secondary.TButton", background=[("active", PALETA["header"])])
+    style.map(
+        "Secondary.TButton",
+        background=[("active", THEME["primary"])]
+    )
+
+    # Treeview
+    style.configure(
+        "Treeview.Heading",
+        background=THEME["primary"],
+        foreground="white",
+        font=("Segoe UI", 10, "bold"),
+        borderwidth=0
+    )
+    style.configure(
+        "Treeview",
+        background=THEME["white"],
+        fieldbackground=THEME["white"],
+        foreground=THEME["text"],
+        font=("Segoe UI", 10),
+        rowheight=26
+    )
+    style.map(
+        "Treeview",
+        background=[("selected", THEME["primary"])],
+        foreground=[("selected", "white")]
+    )
 
     # ---------- Header ----------
-    header = tk.Frame(win, bg=PALETA["header"])
+    header = tk.Frame(win, bg=THEME["primary"])
     header.pack(fill="x")
 
     tk.Label(
         header,
         text="Pacientes registrados",
-        bg=PALETA["header"],
+        bg=THEME["primary"],
         fg="white",
-        font=("Arial", 18, "bold")
+        font=("Segoe UI", 18, "bold")
     ).pack(pady=10)
 
-    # ---------- Frame principal ----------
-    frame_main = tk.Frame(win, bg=PALETA["frame"], padx=10, pady=10)
-    frame_main.pack(fill="both", expand=True, padx=15, pady=(10, 5))
+    # ---------- Contenedor principal ----------
+    contenedor = tk.Frame(win, bg=THEME["bg"])
+    contenedor.pack(fill="both", expand=True, padx=15, pady=(10, 5))
+
+    frame_main = tk.Frame(contenedor, bg=THEME["white"], padx=10, pady=10, bd=1, relief=tk.SOLID)
+    frame_main.pack(fill="both", expand=True)
 
     # ---------- Treeview ----------
-    columns = ("ID_Paciente", "Nombres", "Apellidos", "Fecha_nac",
-                "Telefono", "Direccion", "Seguro_Med")
+    columns = (
+        "ID_Paciente", "Nombres", "Apellidos", "Fecha_nac",
+        "Telefono", "Direccion", "Seguro_Med"
+    )
 
     tree = ttk.Treeview(frame_main, columns=columns, show="headings", height=15)
     tree.pack(side="left", fill="both", expand=True)
-
-    # Estilo del header (Columnas en verde con letras blancas)
-    style.configure(
-        "Treeview.Heading",
-        background=PALETA["header"],
-        foreground="white",
-        font=("Arial", 10, "bold")
-    )
 
     # Encabezados
     tree.heading("ID_Paciente", text="ID")
@@ -83,13 +107,13 @@ def abrir_ventana_listar_pacientes(master, controller):
     tree.heading("Seguro_Med", text="Seguro médico")
 
     # Anchos aprox.
-    tree.column("ID_Paciente", width=40, anchor="center")
-    tree.column("Nombres", width=120)
-    tree.column("Apellidos", width=120)
-    tree.column("Fecha_nac", width=90, anchor="center")
-    tree.column("Telefono", width=90)
-    tree.column("Direccion", width=150)
-    tree.column("Seguro_Med", width=100)
+    tree.column("ID_Paciente", width=50, anchor="center")
+    tree.column("Nombres", width=130, anchor="w")
+    tree.column("Apellidos", width=130, anchor="w")
+    tree.column("Fecha_nac", width=100, anchor="center")
+    tree.column("Telefono", width=100, anchor="center")
+    tree.column("Direccion", width=200, anchor="w")
+    tree.column("Seguro_Med", width=120, anchor="w")
 
     # Scrollbar vertical
     scrollbar = ttk.Scrollbar(frame_main, orient="vertical", command=tree.yview)
@@ -117,7 +141,7 @@ def abrir_ventana_listar_pacientes(master, controller):
             tree.insert(
                 "",
                 tk.END,
-                values=( 
+                values=(
                     p["ID_Paciente"],
                     p["Nombres"],
                     p["Apellidos"],
@@ -132,19 +156,23 @@ def abrir_ventana_listar_pacientes(master, controller):
     cargar_datos()
 
     # ---------- Botones inferiores ----------
-    frame_botones = tk.Frame(win, bg=PALETA["fondo"])
-    frame_botones.pack(side="bottom", pady=10)
+    frame_botones = tk.Frame(contenedor, bg=THEME["bg"])
+    frame_botones.pack(fill="x", pady=10)
+
+    frame_botones.columnconfigure(0, weight=1)
+    frame_botones.columnconfigure(1, weight=0)
+    frame_botones.columnconfigure(2, weight=0)
 
     ttk.Button(
         frame_botones,
         text="Refrescar",
         style="Secondary.TButton",
         command=cargar_datos
-    ).grid(row=0, column=0, padx=10, pady=5)
+    ).grid(row=0, column=1, padx=10, pady=5, sticky="e")
 
     ttk.Button(
         frame_botones,
         text="Cerrar",
         style="Primary.TButton",
         command=win.destroy
-    ).grid(row=0, column=1, padx=10, pady=5)
+    ).grid(row=0, column=2, padx=10, pady=5, sticky="e")
