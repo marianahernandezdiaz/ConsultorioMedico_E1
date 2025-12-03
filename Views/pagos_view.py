@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 
-from Models.factura_model import FacturaModel
+from Controllers.pagos_controller import PagosController
 
 PALETTE = {
     "primary": "#247D7F",
@@ -12,22 +12,22 @@ PALETTE = {
 }
 
 class PagosView(tk.Toplevel):
-    def __init__(self, master):
+    def __init__(self, master, controller=None):
         super().__init__(master)
-        self.model = FacturaModel()
+        self.controller = controller or PagosController()
 
         self.title("Pagos")
         self.geometry("700x450")
-        self.configure(bg=PALETTE["bg"])
+        self.configure(bg=PALETTE["bg"]) 
         style = ttk.Style()
         style.theme_use("clam")
         style.configure("TFrame", background=PALETTE["bg"]) 
         style.configure("TLabel", background=PALETTE["bg"], foreground="#0F3D3E")
         style.configure("Primary.TButton", padding=8, foreground="white", background=PALETTE["primary"]) 
-        style.map("Primary.TButton", background=[("active", PALETTE["secondary"])])
+        style.map("Primary.TButton", background=[["active", PALETTE["secondary"]]])
         style.configure("Treeview", background="#FFFFFF", fieldbackground="#FFFFFF")
         style.configure("Treeview.Heading", background=PALETTE["accent"], foreground="#0F3D3E", font=("Arial", 11, "bold"))
-        style.map("Treeview", background=[("selected", PALETTE["primary"])], foreground=[("selected", "white")])
+        style.map("Treeview", background=[["selected", PALETTE["primary"]]], foreground=[["selected", "white"]])
 
         top = ttk.Frame(self)
         top.pack(fill="x", padx=10, pady=10)
@@ -48,11 +48,11 @@ class PagosView(tk.Toplevel):
         self.grab_set()
 
     def load_todas(self):
-        rows = self.model.list_facturas()
+        rows = self.controller.list_facturas()
         self._load(rows)
 
     def load_pendientes(self):
-        rows = self.model.list_facturas("Pendiente")
+        rows = self.controller.list_facturas("Pendiente")
         self._load(rows)
 
     def _load(self, rows):
@@ -66,7 +66,7 @@ class PagosView(tk.Toplevel):
         if not sel:
             return
         fid = int(self.tree.item(sel[0], "values")[0])
-        ok = self.model.set_estado(fid, "Pagado")
+        ok = self.controller.set_estado(fid, "Pagado")
         if ok:
             messagebox.showinfo("OK", f"Factura {fid} marcada como Pagado", parent=self)
             self.load_pendientes()
@@ -74,6 +74,6 @@ class PagosView(tk.Toplevel):
             messagebox.showerror("Error", "No se pudo actualizar el estado", parent=self)
 
     def destroy(self):
-        self.model.close()
+        self.controller.close()
         self.grab_release()
         super().destroy()

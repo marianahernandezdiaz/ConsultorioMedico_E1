@@ -48,7 +48,7 @@ class MainController:
         if user_data:
             self.current_user = user_data
             self.login_view.destroy() # Cerrar la ventana de Login
-            print(f"✅ Login exitoso. Rol: {self.current_user['Nombre_Rol']}")
+            pass
             
             # 2. Proceder al menú principal/router
             self.show_main_menu(self.current_user['Nombre_Rol'])
